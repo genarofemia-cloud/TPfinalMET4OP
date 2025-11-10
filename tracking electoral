@@ -19,7 +19,7 @@ import os
 df = pd.read_csv("C:/Users/userx/Downloads/miencuesta.csv")
 COLUMNAS_REQUERIDAS = [
     "Fecha", "ID", "Edad", "Sexo", "Nivel_Educativo", "Estrato",
-    "Cantidad_Hogar", "Clase_Social", "Imagen_Candidato",
+    "Cantidad_Hogar", "Imagen_Candidato",
     "Intencion_Voto", "Voto_Anterior"
 ]
 def cargar_datos(ruta):
