@@ -78,3 +78,37 @@ if df is not None and validar_columnas(df, COLUMNAS_REQUERIDAS):
     print("DataFrame listo para procesamiento (imputación, ponderación, tracking).")
 else:
     raise SystemExit("No se puede continuar: error en carga o columnas.")
+
+#%%
+#Tercer paso: manipular los valores faltantes
+df = df[~df[['Intencion_Voto', 'Voto_Anterior', 'Imagen_Candidato']].isna().all(axis=1)] #si faltan las 3 variables claves, descartar encuesta
+df = df[df['Edad'] >= 16] #si alguien tiene menos de 16, se borra la encuesta ya que no puede votar
+df = df[~df['ID'].duplicated()] #si está duplicado, borrarlo
+def hot_deck(df, target_col, ref_cols):  # Bloque genérico para imputar con hot-deck
+    df = df.copy()
+    known = df[df[target_col].notna()]
+    missing = df[df[target_col].isna()]
+    for idx in missing.index:
+        caso = df.loc[idx, ref_cols]
+        dist = pd.Series(0, index=known.index, dtype=float)
+        for ref in ref_cols:
+            if np.issubdtype(df[ref].dtype, np.number):
+                dist += abs(known[ref] - caso[ref]).fillna(1)
+            else:
+                dist += (known[ref] != caso[ref]).fillna(True).astype(int)
+        if dist.isna().all():
+            continue  # si todo fue NaN, paso al siguiente
+        donante = known.loc[dist.idxmin(), target_col]
+        df.loc[idx, target_col] = donante
+    return df
+df['Fecha'] = df['Fecha'].interpolate() #interpolar la fecha
+df['Estrato'] = df['Estrato'].fillna('Desconocido') #rellenar el estrato
+df = hot_deck(df, target_col='Sexo', ref_cols=['Edad', 'Nivel_Educativo', 'Estrato', 'Imagen_Candidato','Intencion_Voto','Voto_Anterior']) #rellenar el sexo
+df['Edad'] = df['Edad'].fillna(df['Edad'].median()) #rellenar la edad
+df = hot_deck(df, target_col='Nivel_Educativo', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Intencion_Voto','Voto_Anterior']) #rellenar el nivel educativo
+df['Cantidad_Hogar'] = df['Cantidad_Hogar'].fillna(df['Cantidad_Hogar'].median()) #rellenar CIH
+df['Imagen_Candidato'] = df['Imagen_Candidato'].fillna(df['Imagen_Candidato'].mean()) #rellenar la imagen
+df = hot_deck(df, target_col='Intencion_Voto', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Nivel_Educativo','Voto_Anterior']) #rellenar voto
+df = hot_deck(df, target_col='Voto_Anterior', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Nivel_Educativo','Intencion_Voto']) #rellenar voto anterior
+df = df.drop('Clase_Social', axis = 1)
+df
