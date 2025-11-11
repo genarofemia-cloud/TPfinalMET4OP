@@ -107,7 +107,7 @@ df = hot_deck(df, target_col='Sexo', ref_cols=['Edad', 'Nivel_Educativo', 'Estra
 df['Edad'] = df['Edad'].fillna(df['Edad'].median()) #rellenar la edad
 df = hot_deck(df, target_col='Nivel_Educativo', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Intencion_Voto','Voto_Anterior']) #rellenar el nivel educativo
 df['Cantidad_Hogar'] = df['Cantidad_Hogar'].fillna(df['Cantidad_Hogar'].median()) #rellenar CIH
-df['Imagen_Candidato'] = df['Imagen_Candidato'].fillna(df['Imagen_Candidato'].mean()) #rellenar la imagen
+df = hot_deck(df, target_col='Imagen del Candidato', ref_cols=['Edad', 'Sexo', 'Estrato', 'Voto','Nivel Educativo','Voto Anterior'])
 df = hot_deck(df, target_col='Intencion_Voto', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Nivel_Educativo','Voto_Anterior']) #rellenar voto
 df = hot_deck(df, target_col='Voto_Anterior', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Nivel_Educativo','Intencion_Voto']) #rellenar voto anterior
 df = df.drop('Clase_Social', axis = 1)
