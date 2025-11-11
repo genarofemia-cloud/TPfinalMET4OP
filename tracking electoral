@@ -101,16 +101,15 @@ def hot_deck(df, target_col, ref_cols):  # Bloque genérico para imputar con hot
         donante = known.loc[dist.idxmin(), target_col]
         df.loc[idx, target_col] = donante
     return df
-df['Fecha'] = df['Fecha'].interpolate() #interpolar la fecha
-df['Estrato'] = df['Estrato'].fillna('Desconocido') #rellenar el estrato
-df = hot_deck(df, target_col='Sexo', ref_cols=['Edad', 'Nivel_Educativo', 'Estrato', 'Imagen_Candidato','Intencion_Voto','Voto_Anterior']) #rellenar el sexo
-df['Edad'] = df['Edad'].fillna(df['Edad'].median()) #rellenar la edad
-df = hot_deck(df, target_col='Nivel_Educativo', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Intencion_Voto','Voto_Anterior']) #rellenar el nivel educativo
-df['Cantidad_Hogar'] = df['Cantidad_Hogar'].fillna(df['Cantidad_Hogar'].median()) #rellenar CIH
+df['Fecha'] = df['Fecha'].interpolate() 
+df['Estrato'] = df['Estrato'].fillna('Desconocido') 
+df = hot_deck(df, target_col='Sexo', ref_cols=['Edad', 'Nivel_Educativo', 'Estrato', 'Imagen_Candidato','Intencion_Voto','Voto_Anterior'])
+df['Edad'] = df['Edad'].fillna(df['Edad'].median()) 
+df = hot_deck(df, target_col='Nivel_Educativo', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Intencion_Voto','Voto_Anterior'])
+df['Cantidad_Hogar'] = df['Cantidad_Hogar'].fillna(df['Cantidad_Hogar'].median())
 df = hot_deck(df, target_col='Imagen del Candidato', ref_cols=['Edad', 'Sexo', 'Estrato', 'Voto','Nivel Educativo','Voto Anterior'])
-df = hot_deck(df, target_col='Intencion_Voto', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Nivel_Educativo','Voto_Anterior']) #rellenar voto
-df = hot_deck(df, target_col='Voto_Anterior', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Nivel_Educativo','Intencion_Voto']) #rellenar voto anterior
-df = df.drop('Clase_Social', axis = 1)
+df = hot_deck(df, target_col='Intencion_Voto', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Nivel_Educativo','Voto_Anterior'])
+df = hot_deck(df, target_col='Voto_Anterior', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Nivel_Educativo','Intencion_Voto'])
 df
 
 # %%
