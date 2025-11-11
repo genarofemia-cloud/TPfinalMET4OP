@@ -112,3 +112,38 @@ df = hot_deck(df, target_col='Intencion_Voto', ref_cols=['Edad', 'Sexo', 'Estrat
 df = hot_deck(df, target_col='Voto_Anterior', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Nivel_Educativo','Intencion_Voto']) #rellenar voto anterior
 df = df.drop('Clase_Social', axis = 1)
 df
+
+# %%
+#Cuarto paso: ponderaciones
+bins = [15, 29, 44, 59, 120]
+labels = ['16–29', '30–44', '45–59', '60+']
+df['Grupo_Edad'] = pd.cut(df['Edad'], bins=bins, labels=labels)
+poblacion = pd.DataFrame({
+    'Sexo': ['Masculino','Masculino','Masculino','Masculino',
+              'Femenino','Femenino','Femenino','Femenino'],
+    'Grupo_Edad': ['16–29','30–44','45–59','60+']*2,
+    'Prop_Poblacion': [0.142, 0.133, 0.108, 0.093,
+             0.145, 0.137, 0.117, 0.125]
+})
+muestra = (
+    df.groupby(['Sexo', 'Grupo_Edad'], dropna=False)
+      .size()
+      .reset_index(name='N_muestra')
+)
+if 'Peso' in df.columns:
+    df.drop(columns=['Peso'], inplace=True)
+muestra['Prop_Muestra'] = muestra['N_muestra'] / muestra['N_muestra'].sum()
+ponderacion = pd.merge(muestra, poblacion, on=['Sexo', 'Grupo_Edad'], how='left')
+ponderacion['Peso_Celda'] = ponderacion['Prop_Poblacion'] / ponderacion['Prop_Muestra']
+df = df.merge(ponderacion[['Sexo', 'Grupo_Edad', 'Peso_Celda']],
+              on=['Sexo', 'Grupo_Edad'], how='left')
+df.rename(columns={'Peso_Celda': 'Peso'}, inplace=True)
+df['Peso'] = df['Peso'].fillna(0)
+df[
+'Peso'] = df['Peso'] / df['Peso'].mean()
+df
+
+#%%
+#Quinto paso: crear nuevas variables / nuevos DFs
+df_mujeres = df[df['Sexo'] == 'Femenino'] #creacion de df filtrado por mujeres a partir del df original
+df_hombres = df[df['Sexo'] == 'Masculino'] #creacion de df filtrado por hombres a partir del df original
