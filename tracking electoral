@@ -139,11 +139,17 @@ df = df.merge(ponderacion[['Sexo', 'Grupo_Edad', 'Peso_Celda']],
               on=['Sexo', 'Grupo_Edad'], how='left')
 df.rename(columns={'Peso_Celda': 'Peso'}, inplace=True)
 df['Peso'] = df['Peso'].fillna(0)
-df[
-'Peso'] = df['Peso'] / df['Peso'].mean()
+df['Peso'] = df['Peso'] / df['Peso'].mean()
 df
 
 #%%
 #Quinto paso: crear nuevas variables / nuevos DFs
 df_mujeres = df[df['Sexo'] == 'Femenino'] #creacion de df filtrado por mujeres a partir del df original
 df_hombres = df[df['Sexo'] == 'Masculino'] #creacion de df filtrado por hombres a partir del df original
+
+#%%
+#Sexto paso: Estadísticas descriptivas básicas
+df.drop(columns=['ID', 'Fecha']).describe()
+media_ponderada = np.average(df['Imagen_Candidato'], weights = df['peso_post']) #sacar media ponderada
+print("Media ponderada de la imagen del candidato:", media_ponderada)
+print("Media de la imagen del candidato sin ponderar:", df['Imagen_Candidato'].mean()) #imagen del candidato sin ponderar
