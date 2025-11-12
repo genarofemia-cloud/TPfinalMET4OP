@@ -123,32 +123,54 @@ else:
     df['Ventana'] = df['fecha'].dt.to_period('W').astype(str)
 
 # %%
-#Quinto paso: pesos por ventanas
+#Quinto Paso: pesos por ventana
 bins = [15, 29, 44, 59, 120]
 labels = ['16–29', '30–44', '45–59', '60+']
-df['Grupo_Edad'] = pd.cut(df['Edad'], bins=bins, labels=labels)
+df['Grupo_Edad'] = pd.cut(df['edad'], bins=bins, labels=labels)
 poblacion = pd.DataFrame({
-    'Sexo': ['Masculino','Masculino','Masculino','Masculino',
-              'Femenino','Femenino','Femenino','Femenino'],
+    'sexo': ['Masculino','Masculino','Masculino','Masculino',
+             'Femenino','Femenino','Femenino','Femenino'],
     'Grupo_Edad': ['16–29','30–44','45–59','60+']*2,
     'Prop_SE': [0.142, 0.133, 0.108, 0.093,
-             0.145, 0.137, 0.117, 0.125]
+                0.145, 0.137, 0.117, 0.125]
 })
+prov = pd.DataFrame({
+    'Provincia': [
+        'Ciudad Autónoma de Buenos Aires','Buenos Aires','Catamarca','Chaco','Chubut','Córdoba',
+        'Corrientes','Entre Ríos','Formosa','Jujuy','La Pampa','La Rioja','Mendoza','Misiones',
+        'Neuquén','Río Negro','Salta','San Juan','San Luis','Santa Cruz','Santa Fe',
+        'Santiago del Estero','Tierra del Fuego','Tucumán'
+    ],
+    'Poblacion': [
+        3121707,17523996,429562,1129606,592621,3840905,
+        1212696,1425578,607419,811611,361859,383865,2043540,1278873,
+        710814,750768,1440672,822853,542069,337226,3544908,
+        1060906,185732,1731820
+    ]
+})
+prov['Prop_Prov'] = prov['Poblacion'] / prov['Poblacion'].sum()
+p = poblacion.assign(key=1).merge(prov.assign(key=1), on='key').drop(columns='key')
+p['Prop_Poblacion'] = p['Prop_SE'] * p['Prop_Prov']
+p = p[['sexo','Grupo_Edad','Provincia','Prop_Poblacion']]
 muestra = (
-    df.groupby(['Sexo', 'Grupo_Edad'], dropna=False)
+    df.groupby(['Ventana','sexo','Grupo_Edad','estrato'])
       .size()
       .reset_index(name='N_muestra')
 )
-if 'Peso' in df.columns:
-    df.drop(columns=['Peso'], inplace=True)
-muestra['Prop_Muestra'] = muestra['N_muestra'] / muestra['N_muestra'].sum()
-ponderacion = pd.merge(muestra, poblacion, on=['Sexo', 'Grupo_Edad'], how='left')
-ponderacion['Peso_Celda'] = ponderacion['Prop_Poblacion'] / ponderacion['Prop_Muestra']
-df = df.merge(ponderacion[['Sexo', 'Grupo_Edad', 'Peso_Celda']],
-              on=['Sexo', 'Grupo_Edad'], how='left')
-df.rename(columns={'Peso_Celda': 'Peso'}, inplace=True)
-df['Peso'] = df['Peso'].fillna(0)
-df['Peso'] = df['Peso'] / df['Peso'].mean()
+muestra['Prop_Muestra'] = muestra.groupby('Ventana')['N_muestra'].transform(lambda x: x / x.sum())
+ponderacion = pd.merge(
+    muestra,
+    p,
+    left_on=['sexo','Grupo_Edad','estrato'],
+    right_on=['sexo','Grupo_Edad','Provincia'],
+    how='left'
+)
+ponderacion['Peso'] = ponderacion['Prop_Poblacion'] / ponderacion['Prop_Muestra']
+df = df.merge(
+    ponderacion[['Ventana','sexo','Grupo_Edad','estrato','Peso']],
+    on=['Ventana','sexo','Grupo_Edad','estrato'],
+    how='left'
+)
 df
 
 #%%
