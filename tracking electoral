@@ -195,3 +195,22 @@ plt.title('Evolución de la imagen del candidato', fontsize = 16)
 plt.tight_layout()
 plt.show()
 
+# %%
+#Octavo Paso: Analizar la evolución de la intención de voto del candidato
+if (conteo_por_dia >= 750).all():
+    df['Ventana'] = df['fecha'].dt.to_period('D')
+else:
+    df['Ventana'] = df['fecha'].dt.to_period('W')
+candidatos = df['voto'].unique().tolist()
+for c in candidatos:
+    df[f'vota_{c}'] = (df['voto'] == c).astype(int)
+    df[f'vota_{c}_ponderada'] = df[f'vota_{c}'] * df['Peso']
+tracking_voto = (
+    df.groupby('Ventana')
+      .apply(lambda g: pd.Series({
+          f"Vota_{c}": (g[f'vota_{c}_ponderada'].sum() / g['Peso'].sum()) * 100
+          for c in candidatos
+      }))
+      .reset_index()
+)
+tracking_voto.round(1)
