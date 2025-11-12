@@ -214,3 +214,14 @@ tracking_voto = (
       .reset_index()
 )
 tracking_voto.round(1)
+
+#%%
+#Noveno Paso: graficar la evolución de la intención de voto
+tracking_voto.plot(figsize=(12,5))
+plt.xlabel('Ventana', fontsize = 10)
+plt.ylabel('Intención de voto (%)', fontsize = 10)
+plt.title('Tracking de intención de voto ponderado', fontsize = 16)
+plt.grid(alpha=0.3)
+plt.legend(title="Candidato")
+plt.show()
+
