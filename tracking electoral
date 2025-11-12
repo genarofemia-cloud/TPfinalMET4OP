@@ -81,9 +81,9 @@ else:
 
 #%%
 #Tercer paso: manipular los valores faltantes
-df = df[~df[['Intencion_Voto', 'Voto_Anterior', 'Imagen_Candidato']].isna().all(axis=1)] #si faltan las 3 variables claves, descartar encuesta
-df = df[df['Edad'] >= 16] #si alguien tiene menos de 16, se borra la encuesta ya que no puede votar
-df = df[~df['ID'].duplicated()] #si está duplicado, borrarlo
+df = df[~df[['voto', 'voto_anterior', 'imagen_del_candidato']].isna().all(axis=1)] #si faltan las 3 variables claves, descartar encuesta
+df = df[df['edad'] >= 16] #si alguien tiene menos de 16, se borra la encuesta ya que no puede votar
+df = df[~df['encuesta'].duplicated()] #si está duplicado, borrarlo
 def hot_deck(df, target_col, ref_cols):  # Bloque genérico para imputar con hot-deck
     df = df.copy()
     known = df[df[target_col].notna()]
@@ -101,15 +101,15 @@ def hot_deck(df, target_col, ref_cols):  # Bloque genérico para imputar con hot
         donante = known.loc[dist.idxmin(), target_col]
         df.loc[idx, target_col] = donante
     return df
-df['Fecha'] = df['Fecha'].interpolate() 
-df['Estrato'] = df['Estrato'].fillna('Desconocido') 
-df = hot_deck(df, target_col='Sexo', ref_cols=['Edad', 'Nivel_Educativo', 'Estrato', 'Imagen_Candidato','Intencion_Voto','Voto_Anterior'])
-df['Edad'] = df['Edad'].fillna(df['Edad'].median()) 
-df = hot_deck(df, target_col='Nivel_Educativo', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Intencion_Voto','Voto_Anterior'])
-df['Cantidad_Hogar'] = df['Cantidad_Hogar'].fillna(df['Cantidad_Hogar'].median())
-df = hot_deck(df, target_col='Imagen del Candidato', ref_cols=['Edad', 'Sexo', 'Estrato', 'Voto','Nivel Educativo','Voto Anterior'])
-df = hot_deck(df, target_col='Intencion_Voto', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Nivel_Educativo','Voto_Anterior'])
-df = hot_deck(df, target_col='Voto_Anterior', ref_cols=['Edad', 'Sexo', 'Estrato', 'Imagen_Candidato','Nivel_Educativo','Intencion_Voto'])
+df['fecha'] = df['fecha'].interpolate() 
+df = df.dropna(subset=['estrato'])
+df = df.dropna(subset=['sexo'])
+df = df.dropna(subset=['edad'])
+df['nivel_educativo'] = df['nivel_educativo'].fillna('Desconocido')
+df['cantidad_de_integrantes_en_el_hogar'] = df['cantidad_de_integrantes_en_el_hogar'].fillna('Desconocido')
+df = hot_deck(df, target_col='imagen_del_candidato', ref_cols=['edad', 'sexo', 'estrato', 'voto','nivel_educativo','voto_anterior'])
+df = hot_deck(df, target_col='voto', ref_cols=['edad', 'sexo', 'estrato', 'imagen_del_candidato','nivel_educativo','voto_anterior'])
+df = hot_deck(df, target_col='voto_anterior', ref_cols=['edad', 'sexo', 'estrato', 'imagen_del_candidato','nivel_educativo','voto'])
 df
 
 # %%
