@@ -81,7 +81,7 @@ else:
 
 #%%
 #Tercer paso: manipular los valores faltantes
-df = df[~df[['voto', 'voto_anterior', 'imagen_del_candidato']].isna().all(axis=1)] #si faltan las 3 variables claves, descartar encuesta
+df = df[~df[['voto', 'imagen_del_candidato']].isna().all(axis=1)] #si faltan las 2 variables claves, descartar encuesta
 df = df[df['edad'] >= 16] #si alguien tiene menos de 16, se borra la encuesta ya que no puede votar
 df = df[~df['encuesta'].duplicated()] #si está duplicado, borrarlo
 def hot_deck(df, target_col, ref_cols):  # Bloque genérico para imputar con hot-deck
