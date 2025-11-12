@@ -174,13 +174,12 @@ df = df.merge(
 df
 
 #%%
-#Sexto paso: crear nuevas variables / nuevos DFs
-df_mujeres = df[df['Sexo'] == 'Femenino'] #creacion de df filtrado por mujeres a partir del df original
-df_hombres = df[df['Sexo'] == 'Masculino'] #creacion de df filtrado por hombres a partir del df original
+#Sexto Paso: ANALIZAR LA EVOLUCIÓN DE LA INTENCIÓN DE VOTO A LO LARGO DEL TIEMPO
+df['Imagen_Ponderada'] = df['Peso'] * df['imagen_del_candidato']
+tracking_imagen = (
+    df.groupby('Ventana')
+      .apply(lambda g: g['Imagen_Ponderada'].sum() / g['Peso'].sum())
+      .reset_index(name='trackeo')
+)
+tracking_imagen
 
-#%%
-#Septimo paso: Estadísticas descriptivas básicas
-df.drop(columns=['ID', 'Fecha']).describe()
-media_ponderada = np.average(df['Imagen_Candidato'], weights = df['Peso']) #sacar media ponderada
-print("Media ponderada de la imagen del candidato:", media_ponderada)
-print("Media de la imagen del candidato sin ponderar:", df['Imagen_Candidato'].mean()) #imagen del candidato sin ponderar
