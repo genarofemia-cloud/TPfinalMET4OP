@@ -17,11 +17,6 @@ import os
 #%%
 #Segundo Paso: cargar el archivo
 df = pd.read_csv("C:/Users/userx/Downloads/miencuesta.csv")
-COLUMNAS_REQUERIDAS = [
-    "Fecha", "ID", "Edad", "Sexo", "Nivel_Educativo", "Estrato",
-    "Cantidad_Hogar", "Imagen_Candidato",
-    "Intencion_Voto", "Voto_Anterior"
-]
 def cargar_datos(ruta):
     try:
         if not os.path.exists(ruta):
@@ -50,6 +45,7 @@ def cargar_datos(ruta):
         print(f"Archivo cargado correctamente ({extension}) → {ruta}")
         print(f"   Filas: {len(df)} | Columnas: {len(df.columns)}")
         return df
+
     except FileNotFoundError as e:
         print(f"Error: {e}")
     except pd.errors.EmptyDataError:
@@ -61,19 +57,25 @@ def cargar_datos(ruta):
     except Exception as e:
         print(f"Error inesperado al cargar el archivo: {e}")
     return None
-def validar_columnas(df, columnas_obligatorias):
-    try:
-        faltantes = [c for c in columnas_obligatorias if c not in df.columns]
-        if faltantes:
-            raise KeyError(f"Faltan las columnas requeridas: {faltantes}")
-        print("Todas las columnas requeridas están presentes.")
-        return True
-    except KeyError as e:
-        print(f"{e}")
-        return False
+
+df.columns = (
+            df.columns
+              .str.strip()
+              .str.lower()
+              .str.replace(" ", "_")
+              .str.replace(r"[^a-z0-9_]", "", regex=True)
+        )
+columnas_requeridas = [
+            "fecha", "encuesta", "estrato", "sexo", "edad", "nivel_educativo", "cantidad_de_integrantes_en_el_hogar", "imagen_del_candidato", "voto", "voto_anterior"
+        ]
+try:
+    faltantes = [col for col in columnas_requeridas if col not in df.columns]
+    if faltantes:
+        raise ValueError(f"Faltan columnas requeridas en el archivo: {faltantes}")
+
 ruta = "C:/Users/userx/Downloads/miencuesta.csv"
 df = cargar_datos(ruta)
-if df is not None and validar_columnas(df, COLUMNAS_REQUERIDAS):
+if df is not None and validar_columnas(df, columnas_requeridas):
     df["Fecha"] = pd.to_datetime(df["Fecha"], errors="coerce")
     print("DataFrame listo para procesamiento (imputación, ponderación, tracking).")
 else:
@@ -182,4 +184,14 @@ tracking_imagen = (
       .reset_index(name='trackeo')
 )
 tracking_imagen
+
+# %%
+#Séptimo Paso: Graficar la evolución de la intención de voto
+plt.figure(figsize=(10,5))
+plt.plot(tracking_imagen['Ventana'], tracking_imagen['trackeo'], marker='o')
+plt.xlabel('Ventana', fontsize = 10)
+plt.ylabel('Imagen promedio', fontsize = 10)
+plt.title('Evolución de la imagen del candidato', fontsize = 16)
+plt.tight_layout()
+plt.show()
 
