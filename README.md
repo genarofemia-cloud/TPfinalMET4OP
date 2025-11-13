@@ -2,17 +2,17 @@
 
 Este proyecto fue desarrollado como trabajo final para la materia Metodología en Opinión Pública, dictada por la cátedra Olego (UBA) durante el segundo cuatrimestre de 2025.
 
-## Objetivo 🎯
+## 🎯 Objetivo 
 
 Diseñar un algoritmo en Python para realizar un seguimiento electoral (tracking) de un candidato que analice la evolución de su apoyo electoral a lo largo del tiempo, utilizando datos sobre su imagen e intención de voto a partir de una muestra representativa de la población, aplicando las herramientas metodológicas adquiridas en la materia. 
 
-## Instalación 🚀
+## 🚀 Instalación 
 
-### Pre-requisitos 📋
+### 📋 Pre-requisitos 
 
-### Pruebas ⚙️
+### ⚙️ Pruebas 
 
-## Autores ✒️
+## ✒️ Autores 
 * **María Jose Perez** 
 * **Charo Sanchez Inda**
 * **Genaro Femia**
