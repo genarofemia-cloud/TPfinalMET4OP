@@ -1,3 +1,15 @@
-##Prueba
+#%%
+#Primer paso: importar las librerías necesarias
+import pandas as pd
 import numpy as np
-import pandas as pd  
+import matplotlib.pyplot as plt
+import seaborn as sns
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from statsmodels.iolib.summary2 import summary_col
+import scipy.stats as st
+from statsmodels.sandbox.stats.runs import cochrans_q
+from sklearn.impute import KNNImputer
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OrdinalEncoder
+import os
