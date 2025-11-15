@@ -146,3 +146,45 @@ df
 df = df.sort_values('fecha')
 df['Ventana_D'] = df['fecha']
 df['Ventana_S'] = df['fecha'].dt.to_period('W')
+
+# %%
+#Quinto Paso: pesos por ventanas
+df['peso_d'] = 1
+df['peso_s'] = 1
+df['edad_cat'] = pd.cut(
+    df['edad'],
+    bins=[15, 29, 44, 59, 120],
+    labels=['16-29', '30-44', '45-59', '60+']
+)
+targets = {
+    'sexo': {'Femenino': 0.53, 'Masculino': 0.47},
+    'edad_cat': {'16-29': 0.29, '30-44': 0.29, '45-59':0.21, '60+': 0.21},
+    'estrato': {'Ciudad Autónoma de Buenos Aires':0.07,'Buenos Aires':0.38,'Catamarca':0.02,'Chaco':0.02,'Chubut':0.01,'Córdoba':0.09,'Corrientes':0.03,'Entre Ríos':0.03,'Formosa':0.01,'Jujuy':0.02,'La Pampa':0.01,'La Rioja':0.01,'Mendoza':0.04,'Misiones':0.02,'Neuquén':0.01,'Río Negro':0.01,'Salta':0.03,'San Juan':0.02,'San Luis':0.01,'Santa Cruz':0.01,'Santa Fe':0.08,'Santiago del Estero':0.02,'Tierra del Fuego':0.01,'Tucumán':0.04}
+}
+for var in targets.keys():
+    df[var] = df[var].astype(str)
+def rake(df, weight_col, targets, max_iter=50, tol=1e-6):
+    df = df.copy()
+    for i in range(max_iter):
+        old_weights = df[weight_col].copy()
+        for var, target_dist in targets.items():
+            current_totals = (
+                df.groupby(var)[weight_col].sum() / df[weight_col].sum()
+            ).to_dict()
+            ratios = {
+                cat: target_dist[cat] / current_totals.get(cat, 1)
+                for cat in target_dist
+            }
+            df[weight_col] *= df[var].map(ratios)
+        if np.max(np.abs(df[weight_col] - old_weights)) < tol:
+            break
+    return df
+df['peso_d'] = (
+    df.groupby('Ventana_D', group_keys=False)
+      .apply(lambda g: rake(g, 'peso_d', targets)['peso_d'])
+)
+df['peso_s'] = (
+    df.groupby('Ventana_S', group_keys=False)
+      .apply(lambda g: rake(g, 'peso_s', targets)['peso_s'])
+)
+df
