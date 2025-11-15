@@ -199,3 +199,13 @@ tracking_imagen_diario = (
       .reset_index(name='trackeo')
 )
 tracking_imagen_diario
+
+# %%
+#Séptimo Paso: Graficar la evolución de la imagen
+plt.figure(figsize=(10,5))
+plt.plot(tracking_imagen_diario['Ventana_D'], tracking_imagen_diario['trackeo'], marker='o')
+plt.xlabel('Ventana (diaria)', fontsize = 10)
+plt.ylabel('Imagen promedio', fontsize = 10)
+plt.title('Evolución de la imagen del candidato (ventana diaria)', fontsize = 16)
+plt.tight_layout()
+plt.show()
