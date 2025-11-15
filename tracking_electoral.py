@@ -82,3 +82,61 @@ except ValueError as e:
 except Exception as e:
     print(f"Error inesperado al cargar el archivo: {e}")
 df['fecha'] = pd.to_datetime(df['fecha'])
+
+#%%
+#Tercer paso: manipular los valores faltantes
+df = df[~df[['voto', 'imagen_del_candidato']].isna().all(axis=1)] #si faltan las 2 variables claves, descartar encuesta
+df = df[df['edad'] >= 16] #si alguien tiene menos de 16, se borra la encuesta ya que no puede votar
+df = df[~df['encuesta'].duplicated()] #si está duplicado, borrarlo
+df['fecha'] = df['fecha'].interpolate()
+ddf = df.dropna(subset=['estrato'])
+df = df.dropna(subset=['sexo'])
+df = df.dropna(subset=['edad'])
+df['nivel_educativo'] = df['nivel_educativo'].fillna('Desconocido')
+df['cantidad_de_integrantes_en_el_hogar'] = df['cantidad_de_integrantes_en_el_hogar'].fillna('Desconocido')
+df_full_va = df[df['voto_anterior'].notna()]
+df_missing_va = df[df['voto_anterior'].isna()]
+if len(df_missing_va) > 0:
+    features_va = ['edad', 'sexo', 'estrato', 'nivel_educativo']
+    X_full_va = pd.get_dummies(df_full_va[features_va], drop_first=True)
+    y_full_va = df_full_va['voto_anterior']
+    model_va = LogisticRegression(multi_class='multinomial', max_iter=2000)
+    model_va.fit(X_full_va, y_full_va)
+    X_missing_va = pd.get_dummies(df_missing_va[features_va], drop_first=True)
+    X_missing_va = X_missing_va.reindex(columns=X_full_va.columns, fill_value=0)
+    preds_va = model_va.predict(X_missing_va)
+    df.loc[df['voto_anterior'].isna(), 'voto_anterior'] = preds_va
+df_full_voto = df[df['voto'].notna()]
+df_missing_voto = df[df['voto'].isna()]
+if len(df_missing_voto) > 0:
+    features_voto = [
+        'edad', 'sexo', 'estrato',
+        'nivel_educativo', 'voto_anterior'
+    ]
+    X_full_voto = pd.get_dummies(df_full_voto[features_voto], drop_first=True)
+    y_full_voto = df_full_voto['voto']
+    model_log = LogisticRegression(
+        multi_class='multinomial',
+        max_iter=2000
+    )
+    model_log.fit(X_full_voto, y_full_voto)
+    X_missing_voto = pd.get_dummies(df_missing_voto[features_voto], drop_first=True)
+    X_missing_voto = X_missing_voto.reindex(columns=X_full_voto.columns, fill_value=0)
+    preds_voto = model_log.predict(X_missing_voto)
+    df.loc[df['voto'].isna(), 'voto'] = preds_voto
+df_full_img = df[df['imagen_del_candidato'].notna()]
+df_missing_img = df[df['imagen_del_candidato'].isna()]
+if len(df_missing_img) > 0:
+    features_img = [
+        'edad', 'sexo', 'estrato',
+        'nivel_educativo', 'voto', 'voto_anterior'
+    ]
+    X_full_img = pd.get_dummies(df_full_img[features_img], drop_first=True)
+    y_full_img = df_full_img['imagen_del_candidato']
+    model_lin = LinearRegression()
+    model_lin.fit(X_full_img, y_full_img)
+    X_missing_img = pd.get_dummies(df_missing_img[features_img], drop_first=True)
+    X_missing_img = X_missing_img.reindex(columns=X_full_img.columns, fill_value=0)
+    preds_img = model_lin.predict(X_missing_img)
+    df.loc[df['imagen_del_candidato'].isna(), 'imagen_del_candidato'] = preds_img
+df
