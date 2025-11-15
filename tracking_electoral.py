@@ -226,3 +226,15 @@ tracking_voto_diario = (
       .reset_index()
 )
 tracking_voto_diario.round(1)
+
+#%%
+#Noveno Paso: graficar la evolución de la intención de voto
+cols_voto = [col for col in tracking_voto_diario.columns if col.startswith('Vota_')]
+tracking_voto_diario.set_index('Ventana_D')[cols_voto].plot(figsize=(10,5))
+plt.xlabel('Ventana(diaria)', fontsize=10)
+plt.ylabel('Intención de voto (%)', fontsize=10)
+plt.title('Tracking de intención de voto (ventana diaria)', fontsize=16)
+plt.grid(alpha=0.3)
+plt.legend(title="Candidato")
+plt.tight_layout()
+plt.show()
