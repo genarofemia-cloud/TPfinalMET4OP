@@ -140,7 +140,7 @@ if len(df_missing_img) > 0:
     X_missing_img = X_missing_img.reindex(columns=X_full_img.columns, fill_value=0)
     preds_img = model_lin.predict(X_missing_img)
     df.loc[df['imagen_del_candidato'].isna(), 'imagen_del_candidato'] = preds_img
-    df['imagen_del_candidato'] = df['imagen_del_candidato'].clip(lower=0, upper=100)
+df['imagen_del_candidato'] = df['imagen_del_candidato'].clip(lower=0, upper=100)
 df
 
 # %%
