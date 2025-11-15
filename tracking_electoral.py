@@ -140,3 +140,9 @@ if len(df_missing_img) > 0:
     preds_img = model_lin.predict(X_missing_img)
     df.loc[df['imagen_del_candidato'].isna(), 'imagen_del_candidato'] = preds_img
 df
+
+# %%
+#Cuarto Paso: definir la ventana
+df = df.sort_values('fecha')
+df['Ventana_D'] = df['fecha']
+df['Ventana_S'] = df['fecha'].dt.to_period('W')
