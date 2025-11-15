@@ -12,6 +12,7 @@ from statsmodels.sandbox.stats.runs import cochrans_q
 from sklearn.impute import KNNImputer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OrdinalEncoder
+from sklearn.linear_model import LogisticRegression, LinearRegression
 import os
 
 #%%
