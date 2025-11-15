@@ -89,7 +89,7 @@ df = df[~df[['voto', 'imagen_del_candidato']].isna().all(axis=1)] #si faltan las
 df = df[df['edad'] >= 16] #si alguien tiene menos de 16, se borra la encuesta ya que no puede votar
 df = df[~df['encuesta'].duplicated()] #si está duplicado, borrarlo
 df['fecha'] = df['fecha'].interpolate()
-ddf = df.dropna(subset=['estrato'])
+df = df.dropna(subset=['estrato'])
 df = df.dropna(subset=['sexo'])
 df = df.dropna(subset=['edad'])
 df['nivel_educativo'] = df['nivel_educativo'].fillna('Desconocido')
