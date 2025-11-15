@@ -83,6 +83,9 @@ except ValueError as e:
 except Exception as e:
     print(f"Error inesperado al cargar el archivo: {e}")
 df['fecha'] = pd.to_datetime(df['fecha'])
+df = df.rename(columns={
+    "cantidad_de_integrantes_en_el_hogar": "integrantes_hogar"
+})
 
 #%%
 #Tercer paso: manipular los valores faltantes
