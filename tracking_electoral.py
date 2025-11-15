@@ -188,3 +188,14 @@ df['peso_s'] = (
       .apply(lambda g: rake(g, 'peso_s', targets)['peso_s'])
 )
 df
+
+# %%
+#Sexto Paso: ANALIZAR LA EVOLUCION DE LA INTENCIÓN DE VOTO A LO LARGO DEL TIEMPO
+#ventana diaria
+df['Imagen_Ponderada_d'] = df['peso_d'] * df['imagen_del_candidato']
+tracking_imagen_diario = (
+    df.groupby('Ventana_D')
+      .apply(lambda g: g['Imagen_Ponderada_d'].sum() / g['peso_d'].sum())
+      .reset_index(name='trackeo')
+)
+tracking_imagen_diario
