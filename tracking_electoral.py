@@ -101,7 +101,7 @@ df = df.dropna(subset=['estrato'])
 df = df.dropna(subset=['sexo'])
 df = df.dropna(subset=['edad'])
 df['nivel_educativo'] = df['nivel_educativo'].fillna('Desconocido')
-df['cantidad_de_integrantes_en_el_hogar'] = df['cantidad_de_integrantes_en_el_hogar'].fillna('Desconocido')
+df['integrantes_hogar'] = df['integrantes_hogar'].fillna('Desconocido')
 df_full_va = df[df['voto_anterior'].notna()]
 df_missing_va = df[df['voto_anterior'].isna()]
 if len(df_missing_va) > 0:
