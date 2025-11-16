@@ -295,3 +295,18 @@ plt.grid(alpha=0.3)
 plt.legend(title="Candidato")
 plt.tight_layout()
 plt.show()
+
+# %%
+#Decimocuarto paso: informe del tracking
+print('Los datos muestran que, durante el período analizado, la media diaria de la imagen del candidato fue:',
+ tracking_imagen_diario['trackeo'].mean(),
+      'con un desvío estándar de:',
+      tracking_imagen_diario['trackeo'].std(),
+      'siendo el valor más bajo que alcanzó:',
+      tracking_imagen_diario['trackeo'].min(),
+      'el día:',
+  tracking_imagen_diario.loc[tracking_imagen_diario['trackeo'].idxmin()]["Ventana_D"].strftime("%Y-%m-%d"),
+      'y el valor más alto que alcanzó:',
+      tracking_imagen_diario['trackeo'].max(),
+      'el día:',
+      tracking_imagen_diario.loc[tracking_imagen_diario['trackeo'].idxmax()]["Ventana_D"].strftime("%Y-%m-%d"))
