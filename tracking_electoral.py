@@ -65,8 +65,7 @@ df.columns = (
             df.columns
               .str.strip()   
               .str.lower()  
-              .str.replace(" ", "_") 
-              .str.replace(r"[^a-z0-9_]", "", regex=True)  
+              .str.replace(" ", "_")  
         )
 columnas_requeridas = [
             "fecha", "encuesta", "estrato", "sexo", "edad", "nivel_educativo", "cantidad_de_integrantes_en_el_hogar", "imagen_del_candidato", "voto", "voto_anterior"
