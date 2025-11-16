@@ -16,6 +16,7 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 import os
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
+import geopandas as gpd
 
 #%%
 #Segundo paso: importar el archivo
