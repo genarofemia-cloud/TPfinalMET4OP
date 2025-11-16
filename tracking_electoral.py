@@ -60,6 +60,7 @@ def cargar_datos(ruta):
     except Exception as e:
         print(f"Error inesperado al cargar el archivo: {e}")
     return None
+df = cargar_datos(var)
 df.columns = (
             df.columns
               .str.strip()   
