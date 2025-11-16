@@ -343,3 +343,37 @@ ax.set_title(f"Imagen promedio del candidato por provincia\nÚltima semana: {ult
 ax.axis('off')
 plt.tight_layout()
 plt.show()
+
+
+# %%
+#Decimosexto Paso: mapa 2
+candidato = 'candidato'   #introducir nombre del candidato a consultar
+df['vota_cand'] = (df['voto'] == candidato).astype(int)
+ultimo_relevo = df['Ventana_S'].max()
+mapa_voto = (
+    df.groupby(['Ventana_S', 'estrato'])
+      .apply(lambda g: (g['vota_cand'] * g['peso_s']).sum() / g['peso_s'].sum() * 100)
+      .reset_index(name='intencion_voto_pct')
+)
+mapa_voto_ultima = mapa_voto[mapa_voto['Ventana_S'] == ultimo_relevo]
+gdf_mapa_voto = provincias_gdf.merge(
+    mapa_voto_ultima[['estrato', 'intencion_voto_pct']],
+    on='estrato',
+    how='left'
+)
+fig, ax = plt.subplots(figsize=(10, 8))
+gdf_mapa_voto.plot(
+    column='intencion_voto_pct',
+    cmap='Blues',
+    legend=True,
+    edgecolor='black',
+    linewidth=0.3,
+    ax=ax,
+)
+ax.set_title(
+    f"Intención de voto a {candidato} por provincia\nÚltima semana: {ultimo_relevo}",
+    fontsize=14
+)
+ax.axis('off')
+plt.tight_layout()
+plt.show()
