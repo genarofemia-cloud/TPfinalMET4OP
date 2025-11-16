@@ -264,3 +264,21 @@ plt.ylabel('Imagen promedio', fontsize = 10)
 plt.title('Evolución de la imagen del candidato (ventana semanal)', fontsize = 16)
 plt.tight_layout()
 plt.show()
+
+# %%
+#Decimosegundo Paso: Analizar la evolución de la intención de voto del candidato
+#ventana semanal
+candidatos = df['voto'].unique().tolist()
+for c in candidatos:
+    df[f'vota_{c}'] = (df['voto'] == c).astype(int)
+    df[f'vota_{c}_ponderada'] = df[f'vota_{c}'] * df['peso_s']
+tracking_voto_semanal= (
+    df.groupby('Ventana_S')
+      .apply(lambda g: pd.Series({
+          f"Vota_{c}": (g[f'vota_{c}_ponderada'].sum() / g['peso_s'].sum()) * 100
+          for c in candidatos
+      }))
+      .reset_index()
+)
+tracking_voto_semanal.round(1)
+
