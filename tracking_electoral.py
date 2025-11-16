@@ -20,8 +20,6 @@ import geopandas as gpd
 
 #%%
 #Segundo paso: importar el archivo
-var ="C:/Users/userx/Downloads/mieencuesta.csv" 
-pd.read_csv(var)
 def cargar_datos(ruta):
     try:
         if not os.path.exists(ruta):
@@ -61,7 +59,8 @@ def cargar_datos(ruta):
     except Exception as e:
         print(f"Error inesperado al cargar el archivo: {e}")
     return None
-df = cargar_datos(var)
+ruta ="C:/Users/userx/Downloads/mieencuesta.csv" 
+df = cargar_datos(ruta)
 df.columns = (
             df.columns
               .str.strip()   
