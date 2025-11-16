@@ -14,6 +14,8 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.linear_model import LogisticRegression, LinearRegression
 import os
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 #%%
 #Segundo paso: importar el archivo
@@ -282,3 +284,14 @@ tracking_voto_semanal= (
 )
 tracking_voto_semanal.round(1)
 
+#%%
+#Decimotercer Paso: graficar la evolución de la intención de voto (semanal)
+cols_voto = [col for col in tracking_voto_semanal.columns if col.startswith('Vota_')]
+tracking_voto_semanal.set_index('Ventana_S')[cols_voto].plot(figsize=(10,5))
+plt.xlabel('Ventana (semanal)', fontsize=10)
+plt.ylabel('Intención de voto (%)', fontsize=10)
+plt.title('Tracking de intención de voto (ventana semanal)', fontsize=16)
+plt.grid(alpha=0.3)
+plt.legend(title="Candidato")
+plt.tight_layout()
+plt.show()
