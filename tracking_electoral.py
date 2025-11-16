@@ -243,3 +243,14 @@ plt.grid(alpha=0.3)
 plt.legend(title="Candidato")
 plt.tight_layout()
 plt.show()
+
+# %%
+#Décimo Paso: ANALIZAR LA EVOLUCIÓN DE LA INTENCIÓN DE VOTO A LO LARGO DEL TIEMPO
+#ventana semanal
+df['Imagen_Ponderada_s'] = df['peso_s'] * df['imagen_del_candidato']
+tracking_imagen_semanal = (
+    df.groupby('Ventana_S')
+      .apply(lambda g: g['Imagen_Ponderada_s'].sum() / g['peso_s'].sum())
+      .reset_index(name='trackeo')
+)
+tracking_imagen_semanal
