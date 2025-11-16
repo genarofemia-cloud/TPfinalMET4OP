@@ -201,13 +201,12 @@ df
 # %%
 #Sexto Paso: ANALIZAR LA EVOLUCION DE LA IMAGEN A LO LARGO DEL TIEMPO
 #ventana diaria
-df['Imagen_Ponderada_d'] = df['peso_d'] * df['imagen_del_candidato']
 tracking_imagen_diario = (
     df.groupby('Ventana_D')
-      .apply(lambda g: g['Imagen_Ponderada_d'].sum() / g['peso_d'].sum())
+      .apply(lambda g: np.average(g['imagen_del_candidato'], weights=g['peso_d']))
       .reset_index(name='trackeo')
 )
-tracking_imagen_diario
+tracking_imagen_diario.round(1)
 
 # %%
 #Séptimo Paso: Graficar la evolución de la imagen
@@ -225,11 +224,10 @@ plt.show()
 candidatos = df['voto'].unique().tolist()
 for c in candidatos:
     df[f'vota_{c}'] = (df['voto'] == c).astype(int)
-    df[f'vota_{c}_ponderada'] = df[f'vota_{c}'] * df['peso_d']
 tracking_voto_diario = (
     df.groupby('Ventana_D')
       .apply(lambda g: pd.Series({
-          f"Vota_{c}": (g[f'vota_{c}_ponderada'].sum() / g['peso_d'].sum()) * 100
+          f"Vota_{c}": np.average(g[f'vota_{c}'], weights=g['peso_d']) * 100
           for c in candidatos
       }))
       .reset_index()
@@ -251,13 +249,12 @@ plt.show()
 # %%
 #Décimo Paso: ANALIZAR LA EVOLUCIÓN DE LA IMAGEN A LO LARGO DEL TIEMPO
 #ventana semanal
-df['Imagen_Ponderada_s'] = df['peso_s'] * df['imagen_del_candidato']
 tracking_imagen_semanal = (
     df.groupby('Ventana_S')
-      .apply(lambda g: g['Imagen_Ponderada_s'].sum() / g['peso_s'].sum())
+      .apply(lambda g: np.average(g['imagen_del_candidato'], weights=g['peso_s']))
       .reset_index(name='trackeo')
 )
-tracking_imagen_semanal
+tracking_imagen_semanal.round(1)
 
 # %%
 #Undécimo Paso: Graficar la evolución de la imagen (semanal)
@@ -275,11 +272,10 @@ plt.show()
 candidatos = df['voto'].unique().tolist()
 for c in candidatos:
     df[f'vota_{c}'] = (df['voto'] == c).astype(int)
-    df[f'vota_{c}_ponderada'] = df[f'vota_{c}'] * df['peso_s']
 tracking_voto_semanal= (
     df.groupby('Ventana_S')
       .apply(lambda g: pd.Series({
-          f"Vota_{c}": (g[f'vota_{c}_ponderada'].sum() / g['peso_s'].sum()) * 100
+          f"Vota_{c}": np.average(g[f'vota_{c}'], weights=g['peso_s']) * 100
           for c in candidatos
       }))
       .reset_index()
@@ -301,15 +297,15 @@ plt.show()
 # %%
 #Decimocuarto paso: informe del tracking
 print('Los datos muestran que, durante el período analizado, la media diaria de la imagen del candidato fue:',
- tracking_imagen_diario['trackeo'].mean(),
+      round(tracking_imagen_diario['trackeo'].mean(),1),
       'con un desvío estándar de:',
-      tracking_imagen_diario['trackeo'].std(),
+      round(tracking_imagen_diario['trackeo'].std(),1),
       'siendo el valor más bajo que alcanzó:',
-      tracking_imagen_diario['trackeo'].min(),
+      round(tracking_imagen_diario['trackeo'].min(),1),
       'el día:',
-  tracking_imagen_diario.loc[tracking_imagen_diario['trackeo'].idxmin()]["Ventana_D"].strftime("%Y-%m-%d"),
+      tracking_imagen_diario.loc[tracking_imagen_diario['trackeo'].idxmin()]["Ventana_D"].strftime("%Y-%m-%d"),
       'y el valor más alto que alcanzó:',
-      tracking_imagen_diario['trackeo'].max(),
+      round(tracking_imagen_diario['trackeo'].max(),1),
       'el día:',
       tracking_imagen_diario.loc[tracking_imagen_diario['trackeo'].idxmax()]["Ventana_D"].strftime("%Y-%m-%d"))
 
@@ -318,13 +314,12 @@ print('Los datos muestran que, durante el período analizado, la media diaria de
 ultimo_relevo = df['Ventana_S'].max()
 mapa_imagen = (
     df.groupby(['Ventana_S', 'estrato'])
-      .apply(lambda g: g['Imagen_Ponderada_d'].sum() / g['peso_s'].sum())
+      .apply(lambda g: np.average(g['imagen_del_candidato'], weights=g['peso_s']))
       .reset_index(name='imagen_estratificada')
 )
 mapa_imagen_ultima = mapa_imagen[mapa_imagen['Ventana_S'] == ultimo_relevo]
-provincias_gdf = gpd.read_file("C:/Users/charo/Downloads/provincias/provincias.shp", encoding="utf-8")
+provincias_gdf = gpd.read_file("my/file/route", encoding="utf-8")
 provincias_gdf.rename(columns={'iso_nombre': 'estrato'}, inplace=True)
-provincias_gdf
 gdf_mapa_imagen = provincias_gdf.merge(
     mapa_imagen_ultima[['estrato', 'imagen_estratificada']],
     on='estrato',
@@ -344,7 +339,6 @@ ax.axis('off')
 plt.tight_layout()
 plt.show()
 
-
 # %%
 #Decimosexto Paso: mapa 2
 candidato = 'candidato'   #introducir nombre del candidato a consultar
@@ -352,7 +346,7 @@ df['vota_cand'] = (df['voto'] == candidato).astype(int)
 ultimo_relevo = df['Ventana_S'].max()
 mapa_voto = (
     df.groupby(['Ventana_S', 'estrato'])
-      .apply(lambda g: (g['vota_cand'] * g['peso_s']).sum() / g['peso_s'].sum() * 100)
+      .apply(lambda g: np.average(g['vota_cand'], weights = g['peso_s']) * 100)
       .reset_index(name='intencion_voto_pct')
 )
 mapa_voto_ultima = mapa_voto[mapa_voto['Ventana_S'] == ultimo_relevo]
