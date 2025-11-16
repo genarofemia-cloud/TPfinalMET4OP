@@ -195,7 +195,7 @@ df['peso_s'] = (
 df
 
 # %%
-#Sexto Paso: ANALIZAR LA EVOLUCION DE LA INTENCIÓN DE VOTO A LO LARGO DEL TIEMPO
+#Sexto Paso: ANALIZAR LA EVOLUCION DE LA IMAGEN A LO LARGO DEL TIEMPO
 #ventana diaria
 df['Imagen_Ponderada_d'] = df['peso_d'] * df['imagen_del_candidato']
 tracking_imagen_diario = (
@@ -245,7 +245,7 @@ plt.tight_layout()
 plt.show()
 
 # %%
-#Décimo Paso: ANALIZAR LA EVOLUCIÓN DE LA INTENCIÓN DE VOTO A LO LARGO DEL TIEMPO
+#Décimo Paso: ANALIZAR LA EVOLUCIÓN DE LA IMAGEN A LO LARGO DEL TIEMPO
 #ventana semanal
 df['Imagen_Ponderada_s'] = df['peso_s'] * df['imagen_del_candidato']
 tracking_imagen_semanal = (
