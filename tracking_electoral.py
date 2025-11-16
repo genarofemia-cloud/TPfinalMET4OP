@@ -311,3 +311,34 @@ print('Los datos muestran que, durante el período analizado, la media diaria de
       tracking_imagen_diario['trackeo'].max(),
       'el día:',
       tracking_imagen_diario.loc[tracking_imagen_diario['trackeo'].idxmax()]["Ventana_D"].strftime("%Y-%m-%d"))
+
+# %%
+#Decimoquinto paso: mapa 1
+ultimo_relevo = df['Ventana_S'].max()
+mapa_imagen = (
+    df.groupby(['Ventana_S', 'estrato'])
+      .apply(lambda g: g['Imagen_Ponderada_d'].sum() / g['peso_s'].sum())
+      .reset_index(name='imagen_estratificada')
+)
+mapa_imagen_ultima = mapa_imagen[mapa_imagen['Ventana_S'] == ultimo_relevo]
+provincias_gdf = gpd.read_file("C:/Users/charo/Downloads/provincias/provincias.shp", encoding="utf-8")
+provincias_gdf.rename(columns={'iso_nombre': 'estrato'}, inplace=True)
+provincias_gdf
+gdf_mapa_imagen = provincias_gdf.merge(
+    mapa_imagen_ultima[['estrato', 'imagen_estratificada']],
+    on='estrato',
+    how='left'
+)
+fig, ax = plt.subplots(figsize=(10, 8))
+gdf_mapa_imagen.plot(
+    column='imagen_estratificada',
+    cmap='RdYlGn',  
+    legend=True,
+    edgecolor='black',
+    linewidth=0.3,
+    ax=ax,
+)
+ax.set_title(f"Imagen promedio del candidato por provincia\nÚltima semana: {ultimo_relevo}", fontsize=14)
+ax.axis('off')
+plt.tight_layout()
+plt.show()
