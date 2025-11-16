@@ -68,22 +68,13 @@ df.columns = (
               .str.replace(" ", "_")  
         )
 columnas_requeridas = [
-            "fecha", "encuesta", "estrato", "sexo", "edad", "nivel_educativo", "cantidad_de_integrantes_en_el_hogar", "imagen_del_candidato", "voto", "voto_anterior"
-        ]
-try:
-    faltantes = [col for col in columnas_requeridas if col not in df.columns]
-    if faltantes:
-        raise ValueError(f"Faltan columnas requeridas en el archivo: {faltantes}")
-except FileNotFoundError as e:
-    print(f"Error: {e}")
-except pd.errors.EmptyDataError:
-    print("Error: el archivo está vacío.")
-except pd.errors.ParserError:
-    print("Error: formato de archivo incorrecto o corrupto.")
-except ValueError as e:
-    print(f"Error: {e}")
-except Exception as e:
-    print(f"Error inesperado al cargar el archivo: {e}")
+    "fecha", "encuesta", "estrato", "sexo", "edad",
+    "nivel_educativo", "cantidad_de_integrantes_en_el_hogar",
+    "imagen_del_candidato", "voto", "voto_anterior"
+]
+faltantes = [col for col in columnas_requeridas if col not in df.columns]
+if faltantes:
+    raise ValueError(f"Faltan columnas requeridas en el archivo: {faltantes}")
 df['fecha'] = pd.to_datetime(df['fecha'])
 df = df.rename(columns={
     "cantidad_de_integrantes_en_el_hogar": "integrantes_hogar"
