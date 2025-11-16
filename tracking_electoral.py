@@ -254,3 +254,13 @@ tracking_imagen_semanal = (
       .reset_index(name='trackeo')
 )
 tracking_imagen_semanal
+
+# %%
+#Undécimo Paso: Graficar la evolución de la imagen (semanal)
+plt.figure(figsize=(15,5))
+plt.plot(tracking_imagen_semanal['Ventana_S'].astype(str), tracking_imagen_semanal['trackeo'], marker='o')
+plt.xlabel('Ventana (semanal)', fontsize = 10)
+plt.ylabel('Imagen promedio', fontsize = 10)
+plt.title('Evolución de la imagen del candidato (ventana semanal)', fontsize = 16)
+plt.tight_layout()
+plt.show()
