@@ -267,45 +267,122 @@ df['Ventana_S'] = df['fecha'].dt.to_period('W')
 df['Ventana_M'] = df['fecha'].dt.to_period('M')
 
 # %%
-#Quinto Paso: pesos por ventanas
-df['peso_d'] = 1
+#Séptimo Paso: elegir tipo de ponderación
+df['peso_d'] = 1 #a priori todos toman peso = 1
 df['peso_s'] = 1
-df['edad_cat'] = pd.cut(
+df['peso_m'] = 1
+df['edad_cat'] = pd.cut( #categorizar edades
     df['edad'],
     bins=[15, 29, 44, 59, 120],
     labels=['16-29', '30-44', '45-59', '60+']
 )
-targets = {
+TARGETS_PREDETERMINADOS = { #target predeterminado
     'sexo': {'Femenino': 0.53, 'Masculino': 0.47},
     'edad_cat': {'16-29': 0.29, '30-44': 0.29, '45-59':0.21, '60+': 0.21},
-    'estrato': {'Ciudad Autónoma de Buenos Aires':0.07,'Buenos Aires':0.38,'Catamarca':0.02,'Chaco':0.02,'Chubut':0.01,'Córdoba':0.09,'Corrientes':0.03,'Entre Ríos':0.03,'Formosa':0.01,'Jujuy':0.02,'La Pampa':0.01,'La Rioja':0.01,'Mendoza':0.04,'Misiones':0.02,'Neuquén':0.01,'Río Negro':0.01,'Salta':0.03,'San Juan':0.02,'San Luis':0.01,'Santa Cruz':0.01,'Santa Fe':0.08,'Santiago del Estero':0.02,'Tierra del Fuego':0.01,'Tucumán':0.04}
+    'region': {'Región Pampeana': 0.68,'Región NOA': 0.14,'Región NEA': 0.08,'Región Cuyo': 0.07,'Región Patagonia': 0.06},
+    'nivel_educativo': {'primaria': 0.29, 'secundaria': 0.44, 'terciario': 0.12, 'universitario': 0.13, 'posgrado': 0.02,}
 }
-for var in targets.keys():
+def leer_targets_desde_csv(path): #opcion por si se quiere aplicar otros parametros de otra poblacion
+    """
+    Esperamos un CSV con columnas:
+    variable, categoria, proporcion
+    Ej:
+    sexo,femenino,0.53
+    sexo,masculino,0.47
+    estrato,Buenos Aires,0.38
+    (tenga en cuenta que las categorías deben matchear con las de su df cargado)
+    """
+    df_t = pd.read_csv(path)
+    targets = {}
+    for var in df_t['variable'].unique():
+        sub = df_t[df_t['variable'] == var]
+        targets[var] = dict(zip(sub['categoria'], sub['proporcion']))
+    return targets
+def elegir_targets(): #seleccionamos tipo de target
+    print("Opciones de parámetros para elegir:")
+    print("  N - Nacional (usa targets predefinidos)")
+    print("  A - Archivo externo (CSV con targets)")
+    opcion = input("Elegí N o A: ").strip().lower()
+    if opcion == 'n':
+        print("Usando targets NACIONALES predefinidos.")
+        return TARGETS_PREDETERMINADOS
+    elif opcion == 'a':
+        path = input("Ruta al archivo CSV con targets: ").strip()
+        print(f"Leyendo targets desde {path} ...")
+        return leer_targets_desde_csv(path)
+    else:
+        print("Opción inválida, uso nacional por defecto.")
+        return TARGETS_PREDETERMINADOS
+targets = elegir_targets()
+for var in targets.keys(): #nos aseguramos de que esté todo en string para que no haya inconvenientes
     df[var] = df[var].astype(str)
-def rake(df, weight_col, targets, max_iter=50, tol=1e-6):
-    df = df.copy()
-    for i in range(max_iter):
-        old_weights = df[weight_col].copy()
-        for var, target_dist in targets.items():
-            current_totals = (
-                df.groupby(var)[weight_col].sum() / df[weight_col].sum()
-            ).to_dict()
-            ratios = {
-                cat: target_dist[cat] / current_totals.get(cat, 1)
-                for cat in target_dist
-            }
-            df[weight_col] *= df[var].map(ratios)
-        if np.max(np.abs(df[weight_col] - old_weights)) < tol:
-            break
-    return df
-df['peso_d'] = (
-    df.groupby('Ventana_D', group_keys=False)
-      .apply(lambda g: rake(g, 'peso_d', targets)['peso_d'])
-)
-df['peso_s'] = (
-    df.groupby('Ventana_S', group_keys=False)
-      .apply(lambda g: rake(g, 'peso_s', targets)['peso_s'])
-)
+target_df = prepare_marginal_dist_for_raking(targets) #raking
+target_weights = pd.Series(1.0, index=target_df.index, name="w_target")
+vars_rake = ['sexo', 'edad_cat', 'region', 'nivel_educativo']
+def aplicar_rake_diario(grupo):
+    try:
+        res = rake(
+            sample_df=grupo[vars_rake],
+            sample_weights=grupo['peso_d'],
+            target_df=target_df,
+            target_weights=target_weights,
+            variables=vars_rake
+        )
+        grupo['peso_d'] = res['weight']
+    except ValueError as e:
+        print(f"No se pudo hacer raking en ventana {grupo.name} ({'peso_d'}): {e}")
+        w = grupo['peso_d'].fillna(1)
+        grupo['peso_d'] = w / w.mean()
+    return grupo
+def aplicar_rake_semanal(grupo):
+    try:
+        res = rake(
+            sample_df=grupo[vars_rake],
+            sample_weights=grupo['peso_s'],
+            target_df=target_df,
+            target_weights=target_weights,
+            variables=vars_rake
+        )
+        grupo['peso_s'] = res['weight']
+    except ValueError as e:
+        print(f"No se pudo hacer raking en ventana {grupo.name} ({'peso_s'}): {e}")
+        w = grupo['peso_s'].fillna(1)
+        grupo['peso_s'] = w / w.mean()
+    return grupo
+def aplicar_rake_mensual(grupo):
+    try:
+        res = rake(
+            sample_df=grupo[vars_rake],
+            sample_weights=grupo['peso_m'],
+            target_df=target_df,
+            target_weights=target_weights,
+            variables=vars_rake
+        )
+        grupo['peso_m'] = res['weight']
+    except ValueError as e:
+        print(f"No se pudo hacer raking en ventana {grupo.name} ({'peso_m'}): {e}")
+        w = grupo['peso_m'].fillna(1)
+        grupo['peso_m'] = w / w.mean()
+    return grupo
+df_rake_diario = df.groupby('Ventana_D', group_keys=False).apply(aplicar_rake_diario) #aplicamos raking para cada ventana
+df_rake_semana = df.groupby('Ventana_S', group_keys=False).apply(aplicar_rake_semanal)
+df_rake_mensual = df.groupby('Ventana_M', group_keys=False).apply(aplicar_rake_mensual)
+df['peso_d'] = df_rake_diario['peso_d'] #al df original le damos los pesos calculados
+df['peso_s'] = df_rake_semana['peso_s']
+df['peso_m'] = df_rake_mensual['peso_m']
+def trimming_pesos(pesos, factor=3): #trimming para evitar colapsos
+    promedio = np.mean(pesos)
+    min_peso = promedio / factor
+    max_peso = promedio * factor
+    return np.clip(pesos, min_peso, max_peso)
+df['peso_d'] = trimming_pesos(df['peso_d']) #aplicamos lo del trimming a los pesos
+df['peso_s'] = trimming_pesos(df['peso_s'])
+df['peso_m'] = trimming_pesos(df['peso_m'])
+def normalizar_pesos(pesos): #normalizacion después del trimming
+    return pesos / pesos.sum() * len(pesos)
+df['peso_d'] = normalizar_pesos(df['peso_d']) #aplicamos la normalización a los pesos
+df['peso_s'] = normalizar_pesos(df['peso_s'])
+df['peso_m'] = normalizar_pesos(df['peso_m'])
 df
 
 # %%
