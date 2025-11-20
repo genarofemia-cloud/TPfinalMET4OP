@@ -447,7 +447,7 @@ def tracking_diario():
             .reset_index(name='imagen_estratificada')
     )
     mapa_imagen_ultima = mapa_imagen[mapa_imagen['Ventana_D'] == ultimo_relevo]
-    provincias_gdf = gpd.read_file("C:/Users/userx/Downloads/mieencuesta.csv", encoding="utf-8")
+    provincias_gdf = gpd.read_file("C:/Users/userx/Downloads/mimapa.shp, encoding="utf-8") #Insertar aquí path al .shp
     provincias_gdf.rename(columns={'iso_nombre': 'estrato'}, inplace=True)
     provincias_gdf['estrato'] = provincias_gdf['estrato'].astype(str).str.strip().str.lower()
     gdf_mapa_imagen = provincias_gdf.merge(
@@ -535,7 +535,7 @@ def tracking_semanal():
             .reset_index(name='imagen_estratificada')
     )
     mapa_imagen_ultima = mapa_imagen[mapa_imagen['Ventana_S'] == ultimo_relevo]
-    provincias_gdf = gpd.read_file("C:/Users/userx/Downloads/mieencuesta.csv", encoding="utf-8")
+    provincias_gdf = gpd.read_file("C:/Users/userx/Downloads/mimapa.shp, encoding="utf-8") #Insertar aquí path al .shp
     provincias_gdf.rename(columns={'iso_nombre': 'estrato'}, inplace=True)
     provincias_gdf['estrato'] = provincias_gdf['estrato'].astype(str).str.strip().str.lower()
     gdf_mapa_imagen = provincias_gdf.merge(
@@ -623,7 +623,7 @@ def tracking_mensual():
             .reset_index(name='imagen_estratificada')
     )
     mapa_imagen_ultima = mapa_imagen[mapa_imagen['Ventana_M'] == ultimo_relevo]
-    provincias_gdf = gpd.read_file("C:/Users/userx/Downloads/mimapa.shp , encoding="utf-8") #Insertar aquí path al .shp
+    provincias_gdf = gpd.read_file("C:/Users/userx/Downloads/mimapa.shp, encoding="utf-8") #Insertar aquí path al .shp
     provincias_gdf.rename(columns={'iso_nombre': 'estrato'}, inplace=True)
     provincias_gdf['estrato'] = provincias_gdf['estrato'].astype(str).str.strip().str.lower()
     gdf_mapa_imagen = provincias_gdf.merge(
