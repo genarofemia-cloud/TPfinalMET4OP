@@ -135,7 +135,7 @@ df = df.dropna(subset=['edad'])
 df['integrantes_hogar'] = df['integrantes_hogar'].fillna('Desconocido')
 
 # %%
-#Cuarto Paso: definir la ventana
+#Sexto Paso: definir la ventana
 df = df.sort_values('fecha')
 df['Ventana_D'] = df['fecha']
 df['Ventana_S'] = df['fecha'].dt.to_period('W')
