@@ -108,6 +108,11 @@ df['region'] = df['estrato'].map({
     'santa cruz': 'Región Patagonia',
     'tierra del fuego': 'Región Patagonia'
 })
+df['nivel_educativo'] = df['nivel_educativo'].astype(str).str.strip().str.lower()
+df['nivel_educativo'] = df['nivel_educativo'].replace({
+    'sin estudios': 'primaria' #para evitar el colapso del raking, se agrupa
+})
+df['sexo'] = df['sexo'].astype(str).str.strip().str.lower()
 
 # %%
 #Cuarto Paso: definir la ventana
