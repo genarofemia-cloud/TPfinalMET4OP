@@ -794,3 +794,42 @@ elif tipo_track == "s":
     plt.show()
 else:
     print("Opción inválida. Sugerencia: revise ortografía")
+
+#%%
+#Decimotercer paso: calcular los intervalos de confianza
+def weighted_std(values, weights):
+    average = np.average(values, weights=weights)
+    variance = np.average((values - average)**2, weights=weights)
+    return np.sqrt(variance)
+def n_efectivo(weights):
+    w = np.array(weights)
+    return (w.sum()**2) / ( (w**2).sum() )
+candidatos = df['voto'].unique().tolist()
+def margen_error_voto(g, peso_col):
+    data = {}
+    pesos = g[peso_col]
+    n_eff = n_efectivo(pesos)
+    for c in candidatos:
+        col = f"vota_{c}"
+        p = np.average(g[col], weights=pesos)   # proporción
+        SE = np.sqrt(p * (1 - p) / n_eff)
+        MOE = 1.96 * SE
+        data[f"Vota_{c}"] = p
+        data[f"Vota_{c}_MOE"] = MOE
+    return pd.Series(data)
+if tipo_track == "d":
+    margen_de_error_img = (
+        df.groupby('Ventana_D')
+          .apply(lambda g: pd.Series({
+              'imagen': np.average(g['imagen_del_candidato'], weights=g['peso_d']),
+              'margen_de_error': weighted_std(g['imagen_del_candidato'], g['peso_d'])
+          }))
+          .reset_index()
+    )
+    print(margen_de_error_img.head())
+    margen_de_error_vot = (
+        df.groupby('Ventana_D')
+          .apply(lambda g: margen_error_voto(g, 'peso_d'))
+          .reset_index()
+    )
+    print(margen_de_error_vot.head())
