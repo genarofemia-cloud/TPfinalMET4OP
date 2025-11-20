@@ -649,3 +649,18 @@ def tracking_mensual():
     ax.axis('off')
     plt.tight_layout()
     plt.show()
+    
+#%%
+#Undécimo paso: elegir el tipo de trackeo
+tipo_track = input("Elegí el tipo de tracking (D = diario, S = semanal, M = mensual): ").strip().lower()
+if tipo_track == "d":
+    print("Generando TRACKING DIARIO...")
+    tracking_diario()
+elif tipo_track == "s":
+    print("Generando TRACKING SEMANAL...")
+    tracking_semanal()
+elif tipo_track == "m":
+    print("Generando TRACKING MENSUAL...")
+    tracking_mensual()
+else:
+    print("Opción inválida. Elegí D, S o M.")
