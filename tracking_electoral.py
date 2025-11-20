@@ -664,3 +664,49 @@ elif tipo_track == "m":
     tracking_mensual()
 else:
     print("Opción inválida. Elegí D, S o M.")
+
+# %%
+# Décimosegundo paso: Mapa de candidato
+candidato_consult = input("Elegí el candidato cuya intención de voto por provincia querés consultar (ATENCIÓN: ESCRIBIR LITERALMENTE)").strip().lower()
+df['voto_norm'] = df['voto'].str.strip().str.lower()
+if tipo_track == "d":
+    df['vota_cand'] = (df['voto_norm'] == candidato_consult).astype(int)
+    ultimo_relevo = df['Ventana_D'].max()
+    mapa_voto = (
+        df.groupby(['Ventana_D', 'estrato'])
+          .apply(lambda g: np.average(g['vota_cand'], weights=g['peso_d']) * 100)
+          .reset_index(name='intencion_voto_pct')
+    )
+    mapa_voto_ultima = mapa_voto[mapa_voto['Ventana_D'] == ultimo_relevo]
+    provincias_gdf = gpd.read_file("C:/Users/userx/Downloads/mimapa.shp", encoding="utf-8") #Insertar aquí path al .shp
+    provincias_gdf = provincias_gdf.rename(columns={'iso_nombre': 'estrato'})
+    provincias_gdf['estrato'] = provincias_gdf['estrato'].astype(str).str.strip().str.lower()
+    gdf_mapa_voto = provincias_gdf.merge(
+        mapa_voto_ultima[['estrato', 'intencion_voto_pct']],
+        on='estrato',
+        how='left'
+    )
+    print("Provincias sin datos de intención de voto:")
+    print(gdf_mapa_voto[gdf_mapa_voto['intencion_voto_pct'].isna()]['estrato'].unique())
+    fig, ax = plt.subplots(figsize=(10, 8))
+    gdf_mapa_voto.plot(
+        column='intencion_voto_pct',
+        cmap='Blues',
+        legend=True,
+        edgecolor='black',
+        linewidth=0.3,
+        ax=ax,
+        missing_kwds={
+        "color": "lightgrey",
+        "edgecolor": "black",
+        "hatch": "///",
+        "label": "Sin datos"
+        }
+    )
+    ax.set_title(
+        f"Intención de voto a {candidato_consult} por provincia\nÚltimo día: {ultimo_relevo}",
+        fontsize=14
+    )
+    ax.axis('off')
+    plt.tight_layout()
+    plt.show()
