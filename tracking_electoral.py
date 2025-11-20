@@ -562,3 +562,90 @@ def tracking_semanal():
     plt.tight_layout()
     plt.show()
 
+# %%
+#Décimo paso: TRACKING MENSUAL
+#ventana mensual
+def tracking_mensual():
+    tracking_imagen_mensual = (
+        df.groupby('Ventana_M')
+          .apply(lambda g: np.average(g['imagen_del_candidato'], weights=g['peso_m']))
+          .reset_index(name='trackeo')
+    )
+    print(tracking_imagen_mensual.round(1))
+    plt.figure(figsize=(10,5))
+    tracking_imagen_mensual.set_index('Ventana_M')['trackeo'].plot(marker='o')
+    plt.xlabel('Ventana (mensual)', fontsize = 10)
+    plt.ylabel('Imagen promedio', fontsize = 10)
+    plt.title('Evolución de la imagen del candidato (ventana mensual)', fontsize = 16)
+    plt.tight_layout()
+    plt.show()
+    candidatos = df['voto'].unique().tolist()
+    for c in candidatos:
+        df[f'vota_{c}'] = (df['voto'] == c).astype(int)
+    tracking_voto_mensual = (
+        df.groupby('Ventana_M')
+          .apply(
+              lambda g: pd.Series({
+                  f"Vota_{c}": np.average(g[f'vota_{c}'], weights=g['peso_m']) * 100
+                  for c in candidatos
+              })
+          )
+          .reset_index()
+    )
+    print(tracking_voto_mensual.round(1))
+    cols_voto = [col for col in tracking_voto_mensual.columns if col.startswith('Vota_')]
+    tracking_voto_mensual.set_index('Ventana_M')[cols_voto].plot(figsize=(10,5))
+    plt.xlabel('Ventana(mensual)', fontsize=10)
+    plt.ylabel('Intención de voto (%)', fontsize=10)
+    plt.title('Tracking de intención de voto (ventana mensual)', fontsize=16)
+    plt.grid(alpha=0.3)
+    plt.legend(title="Candidato")
+    plt.tight_layout()
+    plt.show()
+    print(
+      'Los datos muestran que, durante el período analizado, la media mensual de la imagen del candidato fue:',
+      round(tracking_imagen_mensual['trackeo'].mean(),1),
+      ', con un desvío estándar de:',
+      round(tracking_imagen_mensual['trackeo'].std(),1),
+      ', siendo el valor más bajo que alcanzó:',
+      round(tracking_imagen_mensual['trackeo'].min(),1),
+      'en la fecha:',
+      tracking_imagen_mensual.loc[tracking_imagen_mensual['trackeo'].idxmin()]["Ventana_M"].strftime("%Y-%m-%d"),
+      ', y el valor más alto que alcanzó:',
+      round(tracking_imagen_mensual['trackeo'].max(),1),
+      'en la fecha:',
+      tracking_imagen_mensual.loc[tracking_imagen_mensual['trackeo'].idxmax()]["Ventana_M"].strftime("%Y-%m-%d")
+    )
+    ultimo_relevo = df['Ventana_M'].max()
+    mapa_imagen = (
+        df.groupby(['Ventana_M', 'estrato'])
+            .apply(lambda g: np.average(g['imagen_del_candidato'], weights=g['peso_m']))
+            .reset_index(name='imagen_estratificada')
+    )
+    mapa_imagen_ultima = mapa_imagen[mapa_imagen['Ventana_M'] == ultimo_relevo]
+    provincias_gdf = gpd.read_file("C:/Users/userx/Downloads/provincias/provincias.shp", encoding="utf-8")
+    provincias_gdf.rename(columns={'iso_nombre': 'estrato'}, inplace=True)
+    provincias_gdf['estrato'] = provincias_gdf['estrato'].astype(str).str.strip().str.lower()
+    gdf_mapa_imagen = provincias_gdf.merge(
+        mapa_imagen_ultima[['estrato', 'imagen_estratificada']],
+        on='estrato',
+        how='left'
+    )
+    fig, ax = plt.subplots(figsize=(10, 8))
+    gdf_mapa_imagen.plot(
+        column='imagen_estratificada',
+        cmap='RdYlGn',  
+        legend=True,
+        edgecolor='black',
+        linewidth=0.3,
+        ax=ax,
+        missing_kwds={
+        "color": "lightgrey",
+        "edgecolor": "black",
+        "hatch": "///",
+        }
+        )
+    ax.set_title(f"Imagen promedio del candidato por provincia\nÚltimo mes: {ultimo_relevo}", fontsize=14)
+    ax.axis('off')
+    plt.tight_layout()
+    plt.show()
