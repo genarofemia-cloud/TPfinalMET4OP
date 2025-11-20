@@ -386,175 +386,91 @@ df['peso_m'] = normalizar_pesos(df['peso_m'])
 df
 
 # %%
-#Sexto Paso: ANALIZAR LA EVOLUCION DE LA IMAGEN A LO LARGO DEL TIEMPO
+#Octavo Paso: TRACKING DIARIO
 #ventana diaria
-tracking_imagen_diario = (
-    df.groupby('Ventana_D')
-      .apply(lambda g: np.average(g['imagen_del_candidato'], weights=g['peso_d']))
-      .reset_index(name='trackeo')
-)
-tracking_imagen_diario.round(1)
-
-# %%
-#Séptimo Paso: Graficar la evolución de la imagen
-plt.figure(figsize=(10,5))
-plt.plot(tracking_imagen_diario['Ventana_D'], tracking_imagen_diario['trackeo'], marker='o')
-plt.xlabel('Ventana (diaria)', fontsize = 10)
-plt.ylabel('Imagen promedio', fontsize = 10)
-plt.title('Evolución de la imagen del candidato (ventana diaria)', fontsize = 16)
-plt.tight_layout()
-plt.show()
-
-# %%
-#Octavo Paso: Analizar la evolución de la intención de voto del candidato
-#ventana diaria
-candidatos = df['voto'].unique().tolist()
-for c in candidatos:
-    df[f'vota_{c}'] = (df['voto'] == c).astype(int)
-tracking_voto_diario = (
-    df.groupby('Ventana_D')
-      .apply(lambda g: pd.Series({
-          f"Vota_{c}": np.average(g[f'vota_{c}'], weights=g['peso_d']) * 100
-          for c in candidatos
-      }))
-      .reset_index()
-)
-tracking_voto_diario.round(1)
-
-#%%
-#Noveno Paso: graficar la evolución de la intención de voto
-cols_voto = [col for col in tracking_voto_diario.columns if col.startswith('Vota_')]
-tracking_voto_diario.set_index('Ventana_D')[cols_voto].plot(figsize=(10,5))
-plt.xlabel('Ventana(diaria)', fontsize=10)
-plt.ylabel('Intención de voto (%)', fontsize=10)
-plt.title('Tracking de intención de voto (ventana diaria)', fontsize=16)
-plt.grid(alpha=0.3)
-plt.legend(title="Candidato")
-plt.tight_layout()
-plt.show()
-
-# %%
-#Décimo Paso: ANALIZAR LA EVOLUCIÓN DE LA IMAGEN A LO LARGO DEL TIEMPO
-#ventana semanal
-tracking_imagen_semanal = (
-    df.groupby('Ventana_S')
-      .apply(lambda g: np.average(g['imagen_del_candidato'], weights=g['peso_s']))
-      .reset_index(name='trackeo')
-)
-tracking_imagen_semanal.round(1)
-
-# %%
-#Undécimo Paso: Graficar la evolución de la imagen (semanal)
-plt.figure(figsize=(15,5))
-plt.plot(tracking_imagen_semanal['Ventana_S'].astype(str), tracking_imagen_semanal['trackeo'], marker='o')
-plt.xlabel('Ventana (semanal)', fontsize = 10)
-plt.ylabel('Imagen promedio', fontsize = 10)
-plt.title('Evolución de la imagen del candidato (ventana semanal)', fontsize = 16)
-plt.tight_layout()
-plt.show()
-
-# %%
-#Decimosegundo Paso: Analizar la evolución de la intención de voto del candidato
-#ventana semanal
-candidatos = df['voto'].unique().tolist()
-for c in candidatos:
-    df[f'vota_{c}'] = (df['voto'] == c).astype(int)
-tracking_voto_semanal= (
-    df.groupby('Ventana_S')
-      .apply(lambda g: pd.Series({
-          f"Vota_{c}": np.average(g[f'vota_{c}'], weights=g['peso_s']) * 100
-          for c in candidatos
-      }))
-      .reset_index()
-)
-tracking_voto_semanal.round(1)
-
-#%%
-#Decimotercer Paso: graficar la evolución de la intención de voto (semanal)
-cols_voto = [col for col in tracking_voto_semanal.columns if col.startswith('Vota_')]
-tracking_voto_semanal.set_index('Ventana_S')[cols_voto].plot(figsize=(10,5))
-plt.xlabel('Ventana (semanal)', fontsize=10)
-plt.ylabel('Intención de voto (%)', fontsize=10)
-plt.title('Tracking de intención de voto (ventana semanal)', fontsize=16)
-plt.grid(alpha=0.3)
-plt.legend(title="Candidato")
-plt.tight_layout()
-plt.show()
-
-# %%
-#Decimocuarto paso: informe del tracking
-print('Los datos muestran que, durante el período analizado, la media diaria de la imagen del candidato fue:',
+def tracking_diario():
+    tracking_imagen_diario = (
+        df.groupby('Ventana_D')
+          .apply(lambda g: np.average(g['imagen_del_candidato'], weights=g['peso_d']))
+          .reset_index(name='trackeo')
+    )
+    print(tracking_imagen_diario)
+    tracking_imagen_diario.round(1)
+    plt.figure(figsize=(10,5))
+    plt.plot(tracking_imagen_diario['Ventana_D'], tracking_imagen_diario['trackeo'], marker='o')
+    plt.xlabel('Ventana (diaria)', fontsize = 10)
+    plt.ylabel('Imagen promedio', fontsize = 10)
+    plt.title('Evolución de la imagen del candidato (ventana diaria)', fontsize = 16)
+    plt.tight_layout()
+    plt.show()
+    candidatos = df['voto'].unique().tolist()
+    for c in candidatos:
+        df[f'vota_{c}'] = (df['voto'] == c).astype(int)
+    tracking_voto_diario = (
+        df.groupby('Ventana_D')
+          .apply(
+              lambda g: pd.Series({
+                  f"Vota_{c}": np.average(g[f'vota_{c}'], weights=g['peso_d']) * 100
+                  for c in candidatos
+              })
+          )
+          .reset_index()
+    )
+    print(tracking_voto_diario.round(1))
+    cols_voto = [col for col in tracking_voto_diario.columns if col.startswith('Vota_')]
+    tracking_voto_diario.set_index('Ventana_D')[cols_voto].plot(figsize=(10,5))
+    plt.xlabel('Ventana(diaria)', fontsize=10)
+    plt.ylabel('Intención de voto (%)', fontsize=10)
+    plt.title('Tracking de intención de voto (ventana diaria)', fontsize=16)
+    plt.grid(alpha=0.3)
+    plt.legend(title="Candidato")
+    plt.tight_layout()
+    plt.show()
+    print(
+      'Los datos muestran que, durante el período analizado, la media diaria de la imagen del candidato fue:',
       round(tracking_imagen_diario['trackeo'].mean(),1),
-      'con un desvío estándar de:',
+      ', con un desvío estándar de:',
       round(tracking_imagen_diario['trackeo'].std(),1),
-      'siendo el valor más bajo que alcanzó:',
+      ', siendo el valor más bajo que alcanzó:',
       round(tracking_imagen_diario['trackeo'].min(),1),
       'el día:',
       tracking_imagen_diario.loc[tracking_imagen_diario['trackeo'].idxmin()]["Ventana_D"].strftime("%Y-%m-%d"),
-      'y el valor más alto que alcanzó:',
+      ', y el valor más alto que alcanzó:',
       round(tracking_imagen_diario['trackeo'].max(),1),
       'el día:',
-      tracking_imagen_diario.loc[tracking_imagen_diario['trackeo'].idxmax()]["Ventana_D"].strftime("%Y-%m-%d"))
-
-# %%
-#Decimoquinto paso: mapa 1
-ultimo_relevo = df['Ventana_S'].max()
-mapa_imagen = (
-    df.groupby(['Ventana_S', 'estrato'])
-      .apply(lambda g: np.average(g['imagen_del_candidato'], weights=g['peso_s']))
-      .reset_index(name='imagen_estratificada')
-)
-mapa_imagen_ultima = mapa_imagen[mapa_imagen['Ventana_S'] == ultimo_relevo]
-provincias_gdf = gpd.read_file("my/file/route", encoding="utf-8")
-provincias_gdf.rename(columns={'iso_nombre': 'estrato'}, inplace=True)
-gdf_mapa_imagen = provincias_gdf.merge(
-    mapa_imagen_ultima[['estrato', 'imagen_estratificada']],
-    on='estrato',
-    how='left'
-)
-fig, ax = plt.subplots(figsize=(10, 8))
-gdf_mapa_imagen.plot(
-    column='imagen_estratificada',
-    cmap='RdYlGn',  
-    legend=True,
-    edgecolor='black',
-    linewidth=0.3,
-    ax=ax,
-)
-ax.set_title(f"Imagen promedio del candidato por provincia\nÚltima semana: {ultimo_relevo}", fontsize=14)
-ax.axis('off')
-plt.tight_layout()
-plt.show()
-
-# %%
-#Decimosexto Paso: mapa 2
-candidato = 'candidato'   #introducir nombre del candidato a consultar
-df['vota_cand'] = (df['voto'] == candidato).astype(int)
-ultimo_relevo = df['Ventana_S'].max()
-mapa_voto = (
-    df.groupby(['Ventana_S', 'estrato'])
-      .apply(lambda g: np.average(g['vota_cand'], weights = g['peso_s']) * 100)
-      .reset_index(name='intencion_voto_pct')
-)
-mapa_voto_ultima = mapa_voto[mapa_voto['Ventana_S'] == ultimo_relevo]
-gdf_mapa_voto = provincias_gdf.merge(
-    mapa_voto_ultima[['estrato', 'intencion_voto_pct']],
-    on='estrato',
-    how='left'
-)
-fig, ax = plt.subplots(figsize=(10, 8))
-gdf_mapa_voto.plot(
-    column='intencion_voto_pct',
-    cmap='Blues',
-    legend=True,
-    edgecolor='black',
-    linewidth=0.3,
-    ax=ax,
-)
-ax.set_title(
-    f"Intención de voto a {candidato} por provincia\nÚltima semana: {ultimo_relevo}",
-    fontsize=14
-)
-ax.axis('off')
-plt.tight_layout()
-plt.show()
+      tracking_imagen_diario.loc[tracking_imagen_diario['trackeo'].idxmax()]["Ventana_D"].strftime("%Y-%m-%d")
+    )
+    ultimo_relevo = df['Ventana_D'].max()
+    mapa_imagen = (
+        df.groupby(['Ventana_D', 'estrato'])
+            .apply(lambda g: np.average(g['imagen_del_candidato'], weights=g['peso_d']))
+            .reset_index(name='imagen_estratificada')
+    )
+    mapa_imagen_ultima = mapa_imagen[mapa_imagen['Ventana_D'] == ultimo_relevo]
+    provincias_gdf = gpd.read_file("C:/Users/charo/Downloads/provincias/provincias.shp", encoding="utf-8")
+    provincias_gdf.rename(columns={'iso_nombre': 'estrato'}, inplace=True)
+    provincias_gdf['estrato'] = provincias_gdf['estrato'].astype(str).str.strip().str.lower()
+    gdf_mapa_imagen = provincias_gdf.merge(
+        mapa_imagen_ultima[['estrato', 'imagen_estratificada']],
+        on='estrato',
+        how='left'
+    )
+    fig, ax = plt.subplots(figsize=(10, 8))
+    gdf_mapa_imagen.plot(
+        column='imagen_estratificada',
+        cmap='RdYlGn',  
+        legend=True,
+        edgecolor='black',
+        linewidth=0.3,
+        ax=ax,
+        missing_kwds={
+        "color": "lightgrey",
+        "edgecolor": "black",
+        "hatch": "///",
+        }
+        )
+    ax.set_title(f"Imagen promedio del candidato por provincia\nÚltimo día: {ultimo_relevo}", fontsize=14)
+    ax.axis('off')
+    plt.tight_layout()
+    plt.show()
+    
