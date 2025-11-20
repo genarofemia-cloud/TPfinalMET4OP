@@ -114,6 +114,26 @@ df['nivel_educativo'] = df['nivel_educativo'].replace({
 })
 df['sexo'] = df['sexo'].astype(str).str.strip().str.lower()
 
+#%%
+#Cuarto paso: manipular los valores faltantes para las VI
+df = df[~df[['voto', 'imagen_del_candidato']].isna().all(axis=1)] #si faltan las 2 variables claves, descartar encuesta
+df = df[df['edad'] >= 16] #si alguien tiene menos de 16, se borra la encuesta ya que no puede votar
+df = df[~df['encuesta'].duplicated()] #si está duplicado, borrarlo
+df = df.dropna(subset=['fecha'])
+df = df.dropna(subset=['estrato'])
+df = df.dropna(subset=['nivel_educativo'])
+def normalizar_nivel_educativo(x):
+    niveles_base = ["primaria", "secundaria", "terciario", "universitario", "posgrado"]
+    x = str(x).lower().strip()
+    for nivel in niveles_base:
+        if x.startswith(nivel):
+            return nivel
+    return x
+df['nivel_educativo'] = df['nivel_educativo'].apply(normalizar_nivel_educativo)
+df = df.dropna(subset=['sexo'])
+df = df.dropna(subset=['edad'])
+df['integrantes_hogar'] = df['integrantes_hogar'].fillna('Desconocido')
+
 # %%
 #Cuarto Paso: definir la ventana
 df = df.sort_values('fecha')
