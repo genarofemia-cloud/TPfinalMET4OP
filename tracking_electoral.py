@@ -797,12 +797,14 @@ else:
 #%%
 #Decimotercer paso: calcular los intervalos de confianza
 def weighted_std(values, weights):
+    values = np.array(values)
+    weights = np.array(weights)
     average = np.average(values, weights=weights)
     variance = np.average((values - average)**2, weights=weights)
     return np.sqrt(variance)
 def n_efectivo(weights):
     w = np.array(weights)
-    return (w.sum()**2) / ( (w**2).sum() )
+    return (w.sum()**2) / ((w**2).sum())
 candidatos = df['voto'].unique().tolist()
 def margen_error_voto(g, peso_col):
     data = {}
@@ -810,42 +812,70 @@ def margen_error_voto(g, peso_col):
     n_eff = n_efectivo(pesos)
     for c in candidatos:
         col = f"vota_{c}"
-        p = np.average(g[col], weights=pesos)   # proporción
+        p = np.average(g[col], weights=pesos)
         SE = np.sqrt(p * (1 - p) / n_eff)
         MOE = 1.96 * SE
         data[f"Vota_{c}"] = p
         data[f"Vota_{c}_MOE"] = MOE
+        data[f"Vota_{c}_LI"] = p - MOE
+        data[f"Vota_{c}_LS"] = p + MOE
     return pd.Series(data)
+def margen_error_imagen(g, peso_col):
+    pesos = g[peso_col]
+    valores = g['imagen_del_candidato']
+    n_eff = n_efectivo(pesos)
+    media = np.average(valores, weights=pesos)
+    sd_w = weighted_std(valores, pesos)
+    SE = sd_w / np.sqrt(n_eff)
+    MOE = 1.96 * SE
+    return pd.Series({
+        'imagen_media': media,
+        'MOE_95': MOE,
+        'LI_95': media - MOE,
+        'LS_95': media + MOE
+    })
 if tipo_track == "d":
     margen_de_error_img = (
         df.groupby('Ventana_D')
-          .apply(lambda g: pd.Series({
-              'imagen': np.average(g['imagen_del_candidato'], weights=g['peso_d']),
-              'margen_de_error': weighted_std(g['imagen_del_candidato'], g['peso_d'])
-          }))
+          .apply(lambda g: margen_error_imagen(g, 'peso_d'))
           .reset_index()
     )
-    print(margen_de_error_img.head())
+    print("=== Intervalos de confianza — Imagen (diario) (intervalo de confianza del 95%)===")
+    print(margen_de_error_img)
     margen_de_error_vot = (
         df.groupby('Ventana_D')
           .apply(lambda g: margen_error_voto(g, 'peso_d'))
           .reset_index()
     )
-    print(margen_de_error_vot.head())
-
+    print("=== Intervalos de confianza — Voto (diario) (intervalo de confianza del 95%)===")
+    print(margen_de_error_vot)
 elif tipo_track == "s":
     margen_de_error_img = (
         df.groupby('Ventana_S')
-          .apply(lambda g: pd.Series({
-              'imagen': np.average(g['imagen_del_candidato'], weights=g['peso_s']),
-              'margen_de_error': weighted_std(g['imagen_del_candidato'], g['peso_s'])
-          }))
+          .apply(lambda g: margen_error_imagen(g, 'peso_s'))
           .reset_index()
     )
-    print(margen_de_error_img.head())
+    print("=== Intervalos de confianza — Imagen (semanal) (intervalo de confianza del 95%) ===")
+    print(margen_de_error_img)
     margen_de_error_vot = (
         df.groupby('Ventana_S')
           .apply(lambda g: margen_error_voto(g, 'peso_s'))
           .reset_index()
     )
-    print(margen_de_error_vot.head())
+    print("=== Intervalos de confianza — Voto (semanal) (intervalo de confianza del 95%)===")
+    print(margen_de_error_vot)
+else:
+    margen_de_error_img = (
+        df.groupby('Ventana_M')
+          .apply(lambda g: margen_error_imagen(g, 'peso_m'))
+          .reset_index()
+    )
+    print("=== Intervalos de confianza — Imagen (mensual) (intervalo de confianza del 95%)===")
+    print(margen_de_error_img)
+    margen_de_error_vot = (
+        df.groupby('Ventana_M')
+          .apply(lambda g: margen_error_voto(g, 'peso_m'))
+          .reset_index()
+    )
+    print("\n=== Intervalos de confianza — Voto (mensual) (intervalo de confianza del 95%) ===")
+    print(margen_de_error_vot)
