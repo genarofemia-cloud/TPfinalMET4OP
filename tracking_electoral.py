@@ -833,3 +833,20 @@ if tipo_track == "d":
           .reset_index()
     )
     print(margen_de_error_vot.head())
+
+elif tipo_track == "s":
+    margen_de_error_img = (
+        df.groupby('Ventana_S')
+          .apply(lambda g: pd.Series({
+              'imagen': np.average(g['imagen_del_candidato'], weights=g['peso_s']),
+              'margen_de_error': weighted_std(g['imagen_del_candidato'], g['peso_s'])
+          }))
+          .reset_index()
+    )
+    print(margen_de_error_img.head())
+    margen_de_error_vot = (
+        df.groupby('Ventana_S')
+          .apply(lambda g: margen_error_voto(g, 'peso_s'))
+          .reset_index()
+    )
+    print(margen_de_error_vot.head())
