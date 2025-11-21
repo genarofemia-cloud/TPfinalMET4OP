@@ -879,3 +879,34 @@ else:
     )
     print("\n=== Intervalos de confianza — Voto (mensual) (intervalo de confianza del 95%) ===")
     print(margen_de_error_vot)
+
+# %%
+#Decimocuarto paso: t test
+df_valid = df.groupby('Ventana_S').filter(lambda g: len(g) >= 30)
+primera_ventana = df_valid['Ventana_S'].min()
+ultima_ventana = df_valid['Ventana_S'].max()
+img_ini = df_valid.loc[df_valid['Ventana_S'] == primera_ventana, 'imagen_del_candidato']
+img_fin = df_valid.loc[df_valid['Ventana_S'] == ultima_ventana, 'imagen_del_candidato']
+H0 = "H0: La media de la imagen al inicio es igual a la media al final (μ_inicio = μ_final)."
+H1 = "H1: La media de la imagen al inicio es distinta de la media al final (μ_inicio ≠ μ_final)."
+tstat, pval = ttest_ind(img_ini, img_fin, equal_var=False)
+alpha = 0.05
+if pval < alpha:
+    conclusion_estadistica = (
+        f"p-value = {pval:.6f} < {alpha}. Se RECHAZA H0. "
+        "Existe evidencia estadísticamente significativa de diferencia en la media de imagen "
+        "entre la primera y la última ventana."
+    )
+else:
+    conclusion_estadistica = (
+        f"p-value = {pval:.6f} ≥ {alpha}. NO se rechaza H0. "
+        "No se encuentra evidencia suficiente para afirmar que las medias difieran."
+    )
+print("=== TEST DE HIPÓTESIS SOBRE CAMBIO EN LA IMAGEN DEL CANDIDATO ===\n")
+print("Hipótesis nula (H0):", H0)
+print("Hipótesis alternativa (H1):", H1)
+print("\n--- Resultados del Welch t-test ---")
+print("t-statistic:", tstat)
+print("p-value:", pval)
+print("\n--- Conclusión estadística ---")
+print(conclusion_estadistica)
