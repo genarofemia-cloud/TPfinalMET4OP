@@ -3,20 +3,26 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
-import statsmodels.api as sm
-import statsmodels.formula.api as smf
-from statsmodels.iolib.summary2 import summary_col
 import scipy.stats as st
-from statsmodels.sandbox.stats.runs import cochrans_q
-from sklearn.impute import KNNImputer
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import OrdinalEncoder
-from sklearn.linear_model import LogisticRegression, LinearRegression
 import os
+from sklearn.linear_model import LogisticRegression, LinearRegression
+import geopandas as gpd
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
-import geopandas as gpd
+from scipy.stats import norm
+from balance.weighting_methods.rake import rake, prepare_marginal_dist_for_raking
+import logging
+logging.getLogger("balance").setLevel(logging.ERROR)
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    mean_absolute_error,
+    mean_squared_error,
+    r2_score
+)
+from scipy.stats import ttest_ind
 
 #%%
 #Segundo paso: importar el archivo
