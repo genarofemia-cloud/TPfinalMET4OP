@@ -1,0 +1,7 @@
+pandas
+numpy
+matplotlib
+scipy
+scikit-learn
+geopandas
+balance @ git+https://github.com/miquelsoler/balance.git
