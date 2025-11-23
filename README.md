@@ -71,7 +71,7 @@ c) Modelo para imagen_del_candidato
 * Métricas: MAE, RMSE, R²
 
 ### 6️⃣ Definición de ventanas temporales
-Se crean tresventanas temporales:
+Se crean tres ventanas temporales:
 * Ventana_D → día
 * Ventana_S → semana
 * Ventana_M → mes
