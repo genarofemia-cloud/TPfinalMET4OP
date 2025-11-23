@@ -129,7 +129,7 @@ df = df.dropna(subset=['fecha'])
 df = df.dropna(subset=['estrato'])
 df = df.dropna(subset=['nivel_educativo'])
 def normalizar_nivel_educativo(x):
-    niveles_base = ["primaria", "secundaria", "terciario", "universitario", "posgrado"]
+    niveles_base = ["prim", "sec", "terc", "univ", "pos"]
     x = str(x).lower().strip()
     for nivel in niveles_base:
         if x.startswith(nivel):
@@ -286,7 +286,7 @@ TARGETS_PREDETERMINADOS = { #target predeterminado
     'sexo': {'Femenino': 0.53, 'Masculino': 0.47},
     'edad_cat': {'16-29': 0.29, '30-44': 0.29, '45-59':0.21, '60+': 0.21},
     'region': {'Región Pampeana': 0.68,'Región NOA': 0.14,'Región NEA': 0.08,'Región Cuyo': 0.07,'Región Patagonia': 0.06},
-    'nivel_educativo': {'primaria': 0.29, 'secundaria': 0.44, 'terciario': 0.12, 'universitario': 0.13, 'posgrado': 0.02,}
+    'nivel_educativo': {'prim': 0.29, 'sec': 0.44, 'terc': 0.12, 'univ': 0.13, 'pos': 0.02,}
 }
 def leer_targets_desde_csv(path): #opcion por si se quiere aplicar otros parametros de otra poblacion
     """
