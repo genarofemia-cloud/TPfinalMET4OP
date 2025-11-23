@@ -116,7 +116,7 @@ Se hace para:
 *Imagen del candidato
 *Intención de voto
 
-1️⃣4️⃣ Test de hipótesis: cambio en la imagen del candidato
+### 1️⃣4️⃣ Test de hipótesis: cambio en la imagen del candidato
 Se compara la imagen entre:
 * la primera ventana válida (≥30 casos)
 * la última ventana válida
