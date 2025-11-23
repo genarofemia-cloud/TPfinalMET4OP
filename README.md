@@ -118,12 +118,19 @@ Se hace para:
 
 ### 1️⃣4️⃣ Test de hipótesis: cambio en la imagen del candidato
 Se compara la imagen entre:
-* la primera ventana válida (≥30 casos)
-* la última ventana válida
+* la primera ventana semanal
+* la última ventana semanal
 
 Dependiendo del tamaño de la ventana:
-* ≥30 casos → Welch t-test
-* <30 casos → Mann–Whitney U
+* ≥30 casos → Test paramétrico
+* <30 casos → Test no paramétrico
+
+Si la muestra es lo suficientemente grande (≥30 casos)
+* homocedasticidad → test de t
+* heterocedasticidad → test t de Welch
+
+Si la muestra es pequeña (<30 casos)
+* homocedasticidad → test de Mann-Whitney
 
 El test determina si el cambio es estadísticamente significativo.
 
