@@ -159,9 +159,9 @@ Python 3.9 o superior
 3) Instalar dependencias (pip o conda).
 4) Ejecutar: python tracking_electoral.py
 5) Seguir los pasos interactivos:
-  * Elegir tipo de targets (N o A)
-  * Elegir tipo de tracking (D, S, M)
-  * Escribir el candidato para el mapa final
+   * Elegir tipo de targets (N o A)
+   * Elegir tipo de tracking (D, S, M)
+   * Escribir el candidato para el mapa final
 
 ## ✒️ Autores 
 
