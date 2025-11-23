@@ -113,8 +113,8 @@ Para cada ventana se calcula:
 * Intervalo [LI ; LS]
 
 Se hace para:
-*Imagen del candidato
-*Intención de voto
+* Imagen del candidato
+* Intención de voto
 
 ### 1️⃣4️⃣ Test de hipótesis: cambio en la imagen del candidato
 Se compara la imagen entre:
