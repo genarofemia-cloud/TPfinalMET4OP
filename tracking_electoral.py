@@ -86,7 +86,8 @@ df = df.rename(columns={
     "cantidad_de_integrantes_en_el_hogar": "integrantes_hogar"
 })
 
-#%%Tercer Paso: normalización de variables
+#%%
+#Tercer Paso: normalización de variables
 df['estrato'] = df['estrato'].astype(str).str.strip().str.lower()
 df['region'] = df['estrato'].map({
     'buenos aires': 'Región Pampeana',
