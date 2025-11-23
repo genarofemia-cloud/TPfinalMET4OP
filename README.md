@@ -138,7 +138,10 @@ El test determina si el cambio es estadísticamente significativo.
 ### 🔧 Python
 Python 3.9 o superior
 ### 📦 Librerías
-* Pandas, NumPy, SciPy, Matplotlib
+* Pandas
+* NumPy
+* SciPy
+* Matplotlib
 * Scikit-learn
 * GeoPandas
 * balance 
