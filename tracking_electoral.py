@@ -307,11 +307,11 @@ def leer_targets_desde_csv(path): #opcion por si se quiere aplicar otros paramet
     return targets
 def elegir_targets(): #seleccionamos tipo de target
     print("Opciones de parámetros para elegir:")
-    print("  N - Nacional (usa targets predefinidos)")
+    print("  N - Nacional (usa targets predefinidos del censo 2022)")
     print("  A - Archivo externo (CSV con targets)")
     opcion = input("Elegí N o A: ").strip().lower()
     if opcion == 'n':
-        print("Usando targets NACIONALES predefinidos.")
+        print("Usando targets NACIONALES predefinidos del censo 2022.")
         return TARGETS_PREDETERMINADOS
     elif opcion == 'a':
         path = input("Ruta al archivo CSV con targets: ").strip()
