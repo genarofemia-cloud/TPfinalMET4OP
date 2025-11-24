@@ -682,9 +682,8 @@ else:
 # %%
 # Décimosegundo paso: Mapa de candidato
 candidato_consult = input("Elegí el candidato cuya intención de voto por provincia querés consultar (ATENCIÓN: ESCRIBIR LITERALMENTE)").strip().lower()
-df['voto_norm'] = df['voto'].str.strip().str.lower()
 if tipo_track == "d":
-    df['vota_cand'] = (df['voto_norm'] == candidato_consult).astype(int)
+    df['vota_cand'] = (df['voto'] == candidato_consult).astype(int)
     ultimo_relevo = df['Ventana_D'].max()
     mapa_voto = (
         df.groupby(['Ventana_D', 'estrato'])
@@ -725,7 +724,7 @@ if tipo_track == "d":
     plt.tight_layout()
     plt.show()
 elif tipo_track == "s":
-    df['vota_cand'] = (df['voto_norm'] == candidato_consult).astype(int)
+    df['vota_cand'] = (df['voto'] == candidato_consult).astype(int)
     ultimo_relevo = df['Ventana_S'].max()
     mapa_voto = (
         df.groupby(['Ventana_S', 'estrato'])
@@ -766,7 +765,7 @@ elif tipo_track == "s":
     plt.tight_layout()
     plt.show()
 elif tipo_track == "m":
-    df['vota_cand'] = (df['voto_norm'] == candidato_consult).astype(int)
+    df['vota_cand'] = (df['voto'] == candidato_consult).astype(int)
     ultimo_relevo = df['Ventana_M'].max()
     mapa_voto = (
         df.groupby(['Ventana_M', 'estrato'])
