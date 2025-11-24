@@ -385,11 +385,14 @@ def trimming_pesos(pesos, factor=3): #trimming para evitar colapsos
 df['peso_d'] = trimming_pesos(df['peso_d']) #aplicamos lo del trimming a los pesos
 df['peso_s'] = trimming_pesos(df['peso_s'])
 df['peso_m'] = trimming_pesos(df['peso_m'])
-def normalizar_pesos(pesos): #normalizacion después del trimming
-    return pesos / pesos.sum() * len(pesos)
-df['peso_d'] = normalizar_pesos(df['peso_d']) #aplicamos la normalización a los pesos
-df['peso_s'] = normalizar_pesos(df['peso_s'])
-df['peso_m'] = normalizar_pesos(df['peso_m'])
+def normalizar_pesos(df, peso_col, ventana_col): #normalización después del trimming
+    df[peso_col] = df.groupby(ventana_col)[peso_col].transform(
+        lambda w: w / w.sum() * len(w)
+    )
+    return df
+df = normalizar_pesos(df, 'peso_d', 'Ventana_D')
+df = normalizar_pesos(df, 'peso_s', 'Ventana_S')
+df = normalizar_pesos(df, 'peso_m', 'Ventana_M')
 df
 
 # %%
