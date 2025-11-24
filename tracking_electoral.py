@@ -284,7 +284,7 @@ df['edad_cat'] = pd.cut( #categorizar edades
     labels=['16-29', '30-44', '45-59', '60+']
 )
 TARGETS_PREDETERMINADOS = { #target predeterminado
-    'sexo': {'Femenino': 0.53, 'Masculino': 0.47},
+    'sexo': {'femenino': 0.53, 'masculino': 0.47},
     'edad_cat': {'16-29': 0.29, '30-44': 0.29, '45-59':0.21, '60+': 0.21},
     'region': {'Región Pampeana': 0.68,'Región NOA': 0.14,'Región NEA': 0.08,'Región Cuyo': 0.07,'Región Patagonia': 0.06},
     'nivel_educativo': {'prim': 0.29, 'sec': 0.44, 'terc': 0.12, 'univ': 0.13, 'pos': 0.02,}
