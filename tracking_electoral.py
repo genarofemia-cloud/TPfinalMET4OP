@@ -22,7 +22,7 @@ from sklearn.metrics import (
     mean_squared_error,
     r2_score
 )
-from scipy.stats import ttest_ind
+from scipy.stats import ttest_ind, mannwhitneyu, levene
 
 #%%
 #Segundo paso: importar el archivo
@@ -629,7 +629,7 @@ def tracking_mensual():
             .reset_index(name='imagen_estratificada')
     )
     mapa_imagen_ultima = mapa_imagen[mapa_imagen['Ventana_M'] == ultimo_relevo]
-    provincias_gdf = gpd.read_file("C:/Users/userx/Downloads/mimapa.shp, encoding="utf-8") #Insertar aquí path al .shp
+    provincias_gdf = gpd.read_file("C:/Users/userx/Downloads/mimapa.shp", encoding="utf-8") #Insertar aquí path al .shp
     provincias_gdf.rename(columns={'iso_nombre': 'estrato'}, inplace=True)
     provincias_gdf['estrato'] = provincias_gdf['estrato'].astype(str).str.strip().str.lower()
     gdf_mapa_imagen = provincias_gdf.merge(
@@ -757,7 +757,7 @@ elif tipo_track == "s":
     ax.axis('off')
     plt.tight_layout()
     plt.show()
-    elif tipo_track == "m":
+elif tipo_track == "m":
     df['vota_cand'] = (df['voto_norm'] == candidato_consult).astype(int)
     ultimo_relevo = df['Ventana_M'].max()
     mapa_voto = (
