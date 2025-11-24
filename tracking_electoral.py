@@ -888,32 +888,25 @@ else:
     print(margen_de_error_vot)
 
 # %%
-#Decimocuarto paso: t test
-df_valid = df.groupby('Ventana_S').filter(lambda g: len(g) >= 30)
-primera_ventana = df_valid['Ventana_S'].min()
-ultima_ventana = df_valid['Ventana_S'].max()
-img_ini = df_valid.loc[df_valid['Ventana_S'] == primera_ventana, 'imagen_del_candidato']
-img_fin = df_valid.loc[df_valid['Ventana_S'] == ultima_ventana, 'imagen_del_candidato']
-H0 = "H0: La media de la imagen al inicio es igual a la media al final (μ_inicio = μ_final)."
-H1 = "H1: La media de la imagen al inicio es distinta de la media al final (μ_inicio ≠ μ_final)."
-tstat, pval = ttest_ind(img_ini, img_fin, equal_var=False)
+# Decimocuarto paso: Test estadístico de cambio en la imagen
+primera_ventana = df['Ventana_S'].min()
+ultima_ventana  = df['Ventana_S'].max()
+img_ini = df.loc[df['Ventana_S'] == primera_ventana, 'imagen_del_candidato']
+img_fin = df.loc[df['Ventana_S'] == ultima_ventana,  'imagen_del_candidato']
+n_ini, n_fin = len(img_ini), len(img_fin)
+if n_ini == 0 or n_fin == 0:
+    raise ValueError("Una de las ventanas no tiene datos de imagen.")
+H0 = "H0: La imagen del candidato no cambió significativamente a lo largo de la campaña (μ_inicio = μ_final)"
+H1 = "H1: La imagen del candidato cambió significativamente a lo largo de la campaña (μ_inicio ≠ μ_final)"
 alpha = 0.05
-if pval < alpha:
-    conclusion_estadistica = (
-        f"p-value = {pval:.6f} < {alpha}. Se RECHAZA H0. "
-        "Existe evidencia estadísticamente significativa de diferencia en la media de imagen "
-        "entre la primera y la última ventana."
-    )
-else:
-    conclusion_estadistica = (
-        f"p-value = {pval:.6f} ≥ {alpha}. NO se rechaza H0. "
-        "No se encuentra evidencia suficiente para afirmar que las medias difieran."
-    )
-print("=== TEST DE HIPÓTESIS SOBRE CAMBIO EN LA IMAGEN DEL CANDIDATO ===\n")
-print("Hipótesis nula (H0):", H0)
-print("Hipótesis alternativa (H1):", H1)
-print("\n--- Resultados del Welch t-test ---")
-print("t-statistic:", tstat)
-print("p-value:", pval)
-print("\n--- Conclusión estadística ---")
-print(conclusion_estadistica)
+print("TEST DE HIPÓTESIS SOBRE CAMBIO EN LA IMAGEN")
+print("Ventana inicial:", primera_ventana, " | n =", n_ini)
+print("Ventana final  :", ultima_ventana,  " | n =", n_fin)
+print("Hipótesis nula:", H0)
+print("Hipótesis alternativa:", H1)
+normalidad = (n_ini >= 30) and (n_fin >= 30)
+stat_lev, p_lev = levene(img_ini, img_fin, center='mean')
+homocedasticidad = (p_lev >= alpha)
+print("Test de Levene (homocedasticidad)")
+print("Estadístico:", stat_lev)
+print("p-value:", p_lev)
