@@ -910,3 +910,26 @@ homocedasticidad = (p_lev >= alpha)
 print("Test de Levene (homocedasticidad)")
 print("Estadístico:", stat_lev)
 print("p-value:", p_lev)
+if normalidad and homocedasticidad:
+    print("Condición: Normalidad + Homocedasticidad")
+    print("Uso t-test clásico")
+    tstat, pval = ttest_ind(img_ini, img_fin, equal_var=True)
+elif normalidad and not homocedasticidad:
+    print("Condición: Normalidad + Heterocedasticidad")
+    print("Uso Welch two-sample t-test")
+    tstat, pval = ttest_ind(img_ini, img_fin, equal_var=False)
+elif (not normalidad) and homocedasticidad:
+    print("Condición: NO normalidad + Homocedasticidad")
+    print("Uso Mann–Whitney U Test (no paramétrico)")
+    tstat, pval = mannwhitneyu(img_ini, img_fin, alternative='two-sided')
+else:
+    raise ValueError(
+        "No se puede realizar un test válido: n<30 y NO hay homocedasticidad"
+    )
+print("RESULTADOS")
+print("Estadístico:", tstat)
+print("p-value:", pval)
+if pval < alpha:
+    print("Conclusión: Se RECHAZA H0: la imagen del candidato cambió significativamente a lo largo de la campaña")
+else:
+    print("Conclusión: NO se rechaza H0: no hay evidencia suficiente")
