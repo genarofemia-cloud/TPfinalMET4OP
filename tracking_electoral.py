@@ -88,7 +88,14 @@ df = df.rename(columns={
 
 #%%
 #Tercer Paso: normalización de variables
-df['estrato'] = df['estrato'].astype(str).str.strip().str.lower()
+cols_categoricas = [
+    'sexo', 'estrato', 'nivel_educativo',
+    'voto', 'voto_anterior'
+]
+for col in cols_categoricas:
+    if col in df.columns:
+        df[col] = df[col].astype(str).str.strip().str.lower()
+
 df['region'] = df['estrato'].map({
     'buenos aires': 'Región Pampeana',
     'ciudad autónoma de buenos aires': 'Región Pampeana',
@@ -115,11 +122,9 @@ df['region'] = df['estrato'].map({
     'santa cruz': 'Región Patagonia',
     'tierra del fuego': 'Región Patagonia'
 })
-df['nivel_educativo'] = df['nivel_educativo'].astype(str).str.strip().str.lower()
 df['nivel_educativo'] = df['nivel_educativo'].replace({
     'sin estudios': 'primaria' #para evitar el colapso del raking, se agrupa
 })
-df['sexo'] = df['sexo'].astype(str).str.strip().str.lower()
 
 #%%
 #Cuarto paso: manipular los valores faltantes para las VI
