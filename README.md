@@ -130,7 +130,7 @@ Si la muestra es lo suficientemente grande (≥30 casos)
 * heterocedasticidad → test t de Welch
 
 Si la muestra es pequeña (<30 casos)
-* homocedasticidad → test de Mann-Whitney
+* homocedasticidad → test de Mann–Whitney–Wilcoxon
 
 El test determina si el cambio es estadísticamente significativo.
 
