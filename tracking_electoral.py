@@ -140,7 +140,7 @@ df['nivel_educativo'] = df['nivel_educativo'].apply(normalizar_nivel_educativo)
 df = df.dropna(subset=['sexo'])
 df = df.dropna(subset=['edad'])
 df['integrantes_hogar'] = df['integrantes_hogar'].fillna('Desconocido')
-print("porcentaje de nans previo a la ponderación:", df.isna().mean() * 100)
+print("porcentaje de nans previo a la imputación:", df.isna().mean() * 100)
 
 #%% 
 #Quinto Paso: calcular los valores faltantes para las VD
@@ -267,7 +267,7 @@ df = imputar_numerica(df, variable_objetivo='imagen_del_candidato', variables_pr
 df['imagen_del_candidato'] = df['imagen_del_candidato'].clip(lower=0, upper=100)
 df['voto'] = df['voto'].astype(str).str.strip().str.lower()
 df['voto_anterior'] = df['voto_anterior'].astype(str).str.strip().str.lower()
-print("\nporcentaje de nans post ponderación:", df.isna().mean() * 100)
+print("\nporcentaje de nans post imputación:", df.isna().mean() * 100)
 df
 
 # %%
