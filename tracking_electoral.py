@@ -828,10 +828,10 @@ def margen_error_voto(g, peso_col):
         p = np.average(g[col], weights=pesos)
         SE = np.sqrt(p * (1 - p) / n_eff)
         MOE = 1.96 * SE
-        data[f"Vota_{c}"] = p
-        data[f"Vota_{c}_MOE"] = MOE
-        data[f"Vota_{c}_LI"] = p - MOE
-        data[f"Vota_{c}_LS"] = p + MOE
+        data[f"Vota_{c}"] = p * 100
+        data[f"Vota_{c}_MOE"] = MOE * 100
+        data[f"Vota_{c}_LI"] = (p - MOE) * 100
+        data[f"Vota_{c}_LS"] = (p + MOE) * 100
     return pd.Series(data)
 def margen_error_imagen(g, peso_col):
     pesos = g[peso_col]
