@@ -95,7 +95,6 @@ cols_categoricas = [
 for col in cols_categoricas:
     if col in df.columns:
         df[col] = df[col].astype(str).str.strip().str.lower()
-
 df['region'] = df['estrato'].map({
     'buenos aires': 'Región Pampeana',
     'ciudad autónoma de buenos aires': 'Región Pampeana',
