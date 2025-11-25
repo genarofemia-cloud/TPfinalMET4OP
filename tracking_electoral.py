@@ -99,7 +99,6 @@ df['nivel_educativo'] = df['nivel_educativo'].replace({
 })
 def normalizar_nivel_educativo(x):
     niveles_base = ["prim", "sec", "terc", "univ", "pos"]
-    x = str(x).lower().strip()
     for nivel in niveles_base:
         if x.startswith(nivel):
             return nivel
