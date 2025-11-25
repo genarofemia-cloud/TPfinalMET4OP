@@ -108,7 +108,7 @@ df['integrantes_hogar'] = df['integrantes_hogar'].fillna('Desconocido')
 print("porcentaje de nans previo a la imputación:", df.isna().mean() * 100)
 
 #%%
-#Cuarto Paso: normalización de variables
+#Cuarto Paso: normalización y agrupación de variables
 df['estrato'] = df['estrato'].astype(str).str.strip().str.lower()
 df['sexo'] = df['sexo'].astype(str).str.strip().str.lower()
 df['nivel_educativo'] = df['nivel_educativo'].astype(str).str.strip().str.lower()
@@ -141,6 +141,11 @@ df['region'] = df['estrato'].map({
 df['nivel_educativo'] = df['nivel_educativo'].replace({
     'sin estudios': 'primaria' #para evitar el colapso del raking, se agrupa
 })
+df['edad_cat'] = pd.cut( #categorizar edades
+    df['edad'],
+    bins=[15, 29, 44, 59, 120],
+    labels=['16-29', '30-44', '45-59', '60+']
+)
 
 #%% 
 #Quinto Paso: calcular los valores faltantes para las VD
@@ -282,11 +287,6 @@ df['Ventana_M'] = df['fecha'].dt.to_period('M')
 df['peso_d'] = 1 #a priori todos toman peso = 1
 df['peso_s'] = 1
 df['peso_m'] = 1
-df['edad_cat'] = pd.cut( #categorizar edades
-    df['edad'],
-    bins=[15, 29, 44, 59, 120],
-    labels=['16-29', '30-44', '45-59', '60+']
-)
 TARGETS_PREDETERMINADOS = { #target predeterminado
     'sexo': {'femenino': 0.53, 'masculino': 0.47},
     'edad_cat': {'16-29': 0.29, '30-44': 0.29, '45-59':0.21, '60+': 0.21},
