@@ -268,10 +268,11 @@ def imputar_numerica(df, variable_objetivo, variables_predictoras):
         X_miss = X_miss.reindex(columns=X_full.columns, fill_value=0)
         preds = model.predict(X_miss)
         df.loc[df[variable_objetivo].isna(), variable_objetivo] = preds
+        return df
     else: 
         print("El modelo de IMAGEN NO es bueno, se usará imputación alternativa (mediana general)")
         df['imagen_del_candidato'] = df['imagen_del_candidato'].fillna(df['imagen_del_candidato'].median())
-    return df
+        return df
 df = imputar_categorica(df, variable_objetivo='voto_anterior', variables_predictoras=['edad', 'sexo', 'estrato', 'nivel_educativo'])
 df = imputar_categorica(df, variable_objetivo='voto', variables_predictoras=['edad', 'sexo', 'estrato', 'nivel_educativo', 'voto_anterior'])
 df = imputar_numerica(df, variable_objetivo='imagen_del_candidato', variables_predictoras=['edad', 'sexo', 'estrato', 'nivel_educativo', 'voto', 'voto_anterior'])
