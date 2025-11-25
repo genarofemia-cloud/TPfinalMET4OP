@@ -87,7 +87,28 @@ df = df.rename(columns={
 })
 
 #%%
-#Tercer Paso: normalización de variables
+#Tercer paso: manipular los valores faltantes para las VI
+df = df[~df[['voto', 'imagen_del_candidato']].isna().all(axis=1)] #si faltan las 2 variables claves, descartar encuesta
+df = df[df['edad'] >= 16] #si alguien tiene menos de 16, se borra la encuesta ya que no puede votar
+df = df[~df['encuesta'].duplicated()] #si está duplicado, borrarlo
+df = df.dropna(subset=['fecha'])
+df = df.dropna(subset=['estrato'])
+df = df.dropna(subset=['nivel_educativo'])
+def normalizar_nivel_educativo(x):
+    niveles_base = ["prim", "sec", "terc", "univ", "pos"]
+    x = str(x).lower().strip()
+    for nivel in niveles_base:
+        if x.startswith(nivel):
+            return nivel
+    return x
+df['nivel_educativo'] = df['nivel_educativo'].apply(normalizar_nivel_educativo)
+df = df.dropna(subset=['sexo'])
+df = df.dropna(subset=['edad'])
+df['integrantes_hogar'] = df['integrantes_hogar'].fillna('Desconocido')
+print("porcentaje de nans previo a la imputación:", df.isna().mean() * 100)
+
+#%%
+#Cuarto Paso: normalización de variables
 df['estrato'] = df['estrato'].astype(str).str.strip().str.lower()
 df['sexo'] = df['sexo'].astype(str).str.strip().str.lower()
 df['nivel_educativo'] = df['nivel_educativo'].astype(str).str.strip().str.lower()
@@ -120,27 +141,6 @@ df['region'] = df['estrato'].map({
 df['nivel_educativo'] = df['nivel_educativo'].replace({
     'sin estudios': 'primaria' #para evitar el colapso del raking, se agrupa
 })
-
-#%%
-#Cuarto paso: manipular los valores faltantes para las VI
-df = df[~df[['voto', 'imagen_del_candidato']].isna().all(axis=1)] #si faltan las 2 variables claves, descartar encuesta
-df = df[df['edad'] >= 16] #si alguien tiene menos de 16, se borra la encuesta ya que no puede votar
-df = df[~df['encuesta'].duplicated()] #si está duplicado, borrarlo
-df = df.dropna(subset=['fecha'])
-df = df.dropna(subset=['estrato'])
-df = df.dropna(subset=['nivel_educativo'])
-def normalizar_nivel_educativo(x):
-    niveles_base = ["prim", "sec", "terc", "univ", "pos"]
-    x = str(x).lower().strip()
-    for nivel in niveles_base:
-        if x.startswith(nivel):
-            return nivel
-    return x
-df['nivel_educativo'] = df['nivel_educativo'].apply(normalizar_nivel_educativo)
-df = df.dropna(subset=['sexo'])
-df = df.dropna(subset=['edad'])
-df['integrantes_hogar'] = df['integrantes_hogar'].fillna('Desconocido')
-print("porcentaje de nans previo a la imputación:", df.isna().mean() * 100)
 
 #%% 
 #Quinto Paso: calcular los valores faltantes para las VD
