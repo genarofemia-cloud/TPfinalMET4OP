@@ -9,7 +9,6 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 import geopandas as gpd
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
-from scipy.stats import norm
 from balance.weighting_methods.rake import rake, prepare_marginal_dist_for_raking
 import logging
 logging.getLogger("balance").setLevel(logging.ERROR)
