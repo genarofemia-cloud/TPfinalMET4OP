@@ -139,7 +139,7 @@ df['region'] = df['estrato'].map({
     'tierra del fuego': 'Región Patagonia'
 })
 df['nivel_educativo'] = df['nivel_educativo'].replace({
-    'sin estudios': 'primaria' #para evitar el colapso del raking, se agrupa
+    'sin estudios': 'prim' #para evitar el colapso del raking, se agrupa
 })
 df['edad_cat'] = pd.cut( #categorizar edades
     df['edad'],
