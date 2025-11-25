@@ -254,19 +254,24 @@ def imputar_categorica(df, variable_objetivo, variables_predictoras):
     df.loc[df[variable_objetivo].isna(), variable_objetivo] = preds
     return df
 def imputar_numerica(df, variable_objetivo, variables_predictoras):
-    df_full = df[df[variable_objetivo].notna()]
-    df_miss = df[df[variable_objetivo].isna()]
-    if len(df_miss) == 0:
-        return df
-    X_full = pd.get_dummies(df_full[variables_predictoras], drop_first=True)
-    y_full = df_full[variable_objetivo]
-    model = LinearRegression()
-    model.fit(X_full, y_full)
-    X_miss = pd.get_dummies(df_miss[variables_predictoras], drop_first=True)
-    X_miss = X_miss.reindex(columns=X_full.columns, fill_value=0)
-    preds = model.predict(X_miss)
-    df.loc[df[variable_objetivo].isna(), variable_objetivo] = preds
-    return df
+    if r2_score(y_test_img, y_pred_img) > 0.15:
+        print("El modelo de IMAGEN es suficientemente bueno: imputando imagen con regresión lineal")
+        df_full = df[df[variable_objetivo].notna()]
+        df_miss = df[df[variable_objetivo].isna()]
+        if len(df_miss) == 0:
+            return df
+        X_full = pd.get_dummies(df_full[variables_predictoras], drop_first=True)
+        y_full = df_full[variable_objetivo]
+        model = LinearRegression()
+        model.fit(X_full, y_full)
+        X_miss = pd.get_dummies(df_miss[variables_predictoras], drop_first=True)
+        X_miss = X_miss.reindex(columns=X_full.columns, fill_value=0)
+        preds = model.predict(X_miss)
+        df.loc[df[variable_objetivo].isna(), variable_objetivo] = preds
+    else: 
+        print("El modelo de IMAGEN NO es bueno, se usará imputación alternativa (mediana general)")
+        df['imagen_del_candidato'] = df['imagen_del_candidato'].fillna(df['imagen_del_candidato'].median())
+    return df
 df = imputar_categorica(df, variable_objetivo='voto_anterior', variables_predictoras=['edad', 'sexo', 'estrato', 'nivel_educativo'])
 df = imputar_categorica(df, variable_objetivo='voto', variables_predictoras=['edad', 'sexo', 'estrato', 'nivel_educativo', 'voto_anterior'])
 df = imputar_numerica(df, variable_objetivo='imagen_del_candidato', variables_predictoras=['edad', 'sexo', 'estrato', 'nivel_educativo', 'voto', 'voto_anterior'])
