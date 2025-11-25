@@ -106,6 +106,7 @@ def normalizar_nivel_educativo(x):
             return nivel
     return x
 df['nivel_educativo'] = df['nivel_educativo'].apply(normalizar_nivel_educativo)
+df['sexo'] = df['sexo'].where(df['sexo'].isin(['femenino','masculino']), np.nan)
 df = df.dropna(subset=['sexo'])
 df = df.dropna(subset=['edad'])
 df['integrantes_hogar'] = df['integrantes_hogar'].fillna('Desconocido')
