@@ -94,6 +94,10 @@ df = df[~df['encuesta'].duplicated()] #si está duplicado, borrarlo
 df = df.dropna(subset=['fecha'])
 df = df.dropna(subset=['estrato'])
 df = df.dropna(subset=['nivel_educativo'])
+df['nivel_educativo'] = df['nivel_educativo'].astype(str).str.strip().str.lower()
+df['nivel_educativo'] = df['nivel_educativo'].replace({
+    'sin estudios': 'prim' #para evitar el colapso del raking, se agrupa
+})
 def normalizar_nivel_educativo(x):
     niveles_base = ["prim", "sec", "terc", "univ", "pos"]
     x = str(x).lower().strip()
@@ -111,7 +115,6 @@ print("porcentaje de nans previo a la imputación:", df.isna().mean() * 100)
 #Cuarto Paso: normalización y agrupación de variables
 df['estrato'] = df['estrato'].astype(str).str.strip().str.lower()
 df['sexo'] = df['sexo'].astype(str).str.strip().str.lower()
-df['nivel_educativo'] = df['nivel_educativo'].astype(str).str.strip().str.lower()
 df['region'] = df['estrato'].map({
     'buenos aires': 'Región Metropolitana',
     'ciudad autónoma de buenos aires': 'Región Metropolitana',
@@ -137,9 +140,6 @@ df['region'] = df['estrato'].map({
     'río negro': 'Región Patagonia',
     'santa cruz': 'Región Patagonia',
     'tierra del fuego': 'Región Patagonia'
-})
-df['nivel_educativo'] = df['nivel_educativo'].replace({
-    'sin estudios': 'prim' #para evitar el colapso del raking, se agrupa
 })
 df['edad_cat'] = pd.cut( #categorizar edades
     df['edad'],
