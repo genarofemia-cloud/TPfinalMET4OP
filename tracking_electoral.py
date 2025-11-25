@@ -290,7 +290,7 @@ df['edad_cat'] = pd.cut( #categorizar edades
 TARGETS_PREDETERMINADOS = { #target predeterminado
     'sexo': {'femenino': 0.53, 'masculino': 0.47},
     'edad_cat': {'16-29': 0.29, '30-44': 0.29, '45-59':0.21, '60+': 0.21},
-    'region': {'Región Metropolitana': 0.45, 'Región Pampeana': 0.23,'Región NOA': 0.14,'Región NEA': 0.08,'Región Cuyo': 0.07,'Región Patagonia': 0.06},
+    'region': {'Región Metropolitana': 0.42, 'Región Pampeana': 0.23,'Región NOA': 0.14,'Región NEA': 0.08,'Región Cuyo': 0.07,'Región Patagonia': 0.06},
     'nivel_educativo': {'prim': 0.29, 'sec': 0.44, 'terc': 0.12, 'univ': 0.13, 'pos': 0.02,}
 }
 def leer_targets_desde_csv(path): #opcion por si se quiere aplicar otros parametros de otra poblacion
